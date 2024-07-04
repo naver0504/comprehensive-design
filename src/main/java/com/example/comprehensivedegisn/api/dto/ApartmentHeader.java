@@ -6,5 +6,5 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 @JacksonXmlRootElement(localName = "header")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ApartmentHeader(@JacksonXmlProperty(localName = "resultCode") String resultCode,
+public record ApartmentHeader(@JacksonXmlProperty(localName = "resultCode") int resultCode,
                                @JacksonXmlProperty(localName = "resultMsg") String resultMessage) {}
