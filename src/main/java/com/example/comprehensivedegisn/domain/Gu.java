@@ -16,7 +16,7 @@ public enum Gu {
     마포구("11440"), 서대문구("11410"), 서초구("11650"), 성동구("11200"),
     성북구("11290"), 송파구("11710"), 양천구("11470"), 영등포구("11560"),
     용산구("11170"), 은평구("11380"), 종로구("11110"), 중구("11140"),
-    중랑구("11260"), 서울특별시("11000");
+    중랑구("11260");
 
     private final String regionalCode;
 
@@ -26,10 +26,7 @@ public enum Gu {
         return guList.stream()
                 .filter(gu -> Objects.equals(gu.getRegionalCode(), guName))
                 .findFirst()
-                .orElseThrow(() -> {
-                    System.out.println(guName);
-                    throw new IllegalArgumentException("해당하는 구가 없습니다.");
-                });
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 구가 없습니다."));
     }
 
 }
