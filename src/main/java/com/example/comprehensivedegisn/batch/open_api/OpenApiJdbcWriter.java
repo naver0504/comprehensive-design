@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse>, ItemStream {
+public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
 
 
 
@@ -25,12 +25,6 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse>, I
 
     @Value("#{jobParameters[regionalCode]}")
     private String regionalCode;
-
-    @Value("#{jobParameters[contractDate]}")
-    private String contractDate;
-
-    @Value("#{jobParameters[pageNo]}")
-    private int pageNo;
 
     private final String INSERT_SQL =
             "INSERT INTO apartment_transaction (" +
@@ -103,21 +97,6 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse>, I
                         return items.size();
                     }
                 });
-
-    }
-
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        executionContext.putInt("curPageNo", pageNo);
-        executionContext.putString("curContractDate", contractDate);
-        executionContext.putString("regionalCode", regionalCode);
-    }
-
-    @Override
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
-        pageNo = executionContext.getInt("pageNo");
-        contractDate = executionContext.getString("contractDate");
-        regionalCode = executionContext.getString("regionalCode");
 
     }
 }
