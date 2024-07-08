@@ -32,7 +32,6 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
         if(OpenApiUtils.isEndOfData(response)) return null;
 
         if(response.isEndOfPage()){
-            System.out.println("End of Page");
             contractDate = OpenApiUtils.getPreMonthContractDate(contractDate);
             pageNo = 1;
             return response;
@@ -53,7 +52,7 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
         }
 
         if (executionContext.containsKey("lastContractDate")) {
-            contractDate = OpenApiUtils.getPreMonthContractDate(LocalDate.parse(executionContext.getString("lastContractDate")));
+            contractDate = LocalDate.parse(executionContext.getString("lastContractDate"));
         } else {
             executionContext.putString("lastContractDate", contractDate.toString());
         }
@@ -63,6 +62,5 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
     public void update(ExecutionContext executionContext) throws ItemStreamException {
         executionContext.putInt("lastPageNo", pageNo);
         executionContext.putString("lastContractDate", contractDate.toString());
-
     }
 }
