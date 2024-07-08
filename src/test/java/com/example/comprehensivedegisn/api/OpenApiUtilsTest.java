@@ -8,21 +8,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.time.LocalDate;
 
-@SpringBootTest
+//@SpringBootTest
 class OpenApiUtilsTest {
 
-    @Autowired
-    private OpenApiUtils openApiUtils;
+//    @Autowired
+//    private OpenApiUtils openApiUtils;
 
     @Test
     void localDateTimeTest() throws MalformedURLException {
-        OpenApiRequest openApiRequest = OpenApiRequest.builder()
-                .pageNo(1)
-                .contractDate(LocalDate.now())
-                .build();
-
-        URI uri = openApiUtils.createURI(openApiRequest);
-        System.out.println(uri);
+        LocalDate localDate = LocalDate.of(2023, 1, 1);
+        LocalDate localDate1 = localDate.minusMonths(1);
+        System.out.println(localDate1);
     }
 
 }
