@@ -1,26 +1,30 @@
 package com.example.comprehensivedegisn.api;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenApiRequest {
 
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
+
+    private int numOfRows;
+    private String LAWD_CD;
+    private int pageNo;
+    private String contractDate;
+
     @Builder
-    public OpenApiRequest(int pageNo, LocalDate contractDate) {
+    public OpenApiRequest(int numOfRows, String LAWD_CD, int pageNo, LocalDate contractDate) {
+        this.numOfRows = numOfRows;
+        this.LAWD_CD = LAWD_CD;
         this.pageNo = pageNo;
-        this.contractDate = contractDate;
+        this.contractDate = convertLocalDateToString(contractDate);
     }
 
-    private int numOfRows = 100;
-    private String LAWD_CD = "11000";
-
-    private int pageNo;
-    private LocalDate contractDate;
-
-    public String getFormattedContractDate() {
-        return contractDate.toString().replace("-", "");
+    public String convertLocalDateToString(LocalDate localDate) {
+        return formatter.format(localDate);
     }
 }
