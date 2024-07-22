@@ -5,7 +5,6 @@ import com.example.comprehensivedegisn.batch.open_api.OpenApiBatchConfiguration;
 import com.example.comprehensivedegisn.domain.Gu;
 import com.example.comprehensivedegisn.domain.repository.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.domain.repository.DongRepository;
-import org.aspectj.lang.annotation.After;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
