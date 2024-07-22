@@ -15,14 +15,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import java.time.LocalDate;
 
-import static com.example.comprehensivedegisn.domain.Gu.강남구;
 import static com.example.comprehensivedegisn.domain.Gu.노원구;
 
 @SpringBootTest
@@ -44,6 +43,9 @@ public class BatchTest {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private BeanFactory beanFactory;
+
     @AfterEach
     void tearDown() {
         jobRepositoryTestUtils.removeJobExecutions();
@@ -52,6 +54,7 @@ public class BatchTest {
 
     @Test
     void checkStep() throws Exception {
+
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("regionalCode", 노원구.getRegionalCode());
 
@@ -69,10 +72,13 @@ public class BatchTest {
     void testJob() throws Exception {
 
 
+        Job job = beanFactory.getBean("simpleOpenApiJob", Job.class);
+
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addString("regionalCode", Gu.중구.getRegionalCode());
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
 
+        jobLauncherTestUtils.setJob(job);
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
 
         // Check if the job execution is successful
