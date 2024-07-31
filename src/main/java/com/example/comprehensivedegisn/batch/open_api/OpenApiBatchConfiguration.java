@@ -26,7 +26,6 @@ public class OpenApiBatchConfiguration {
     private final OpenApiClient openApiClient;
     private final PlatformTransactionManager platformTransactionManager;
     private final JdbcTemplate jdbcTemplate;
-
     private final DongRepository dongRepository;
 
     public static int CHUNK_SIZE = 1;
@@ -43,8 +42,15 @@ public class OpenApiBatchConfiguration {
         return new StepBuilder("simpleOpenApiStep", jobRepository)
                 .<ApartmentDetailResponse, ApartmentDetailResponse>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(simpleOpenApiReader())
-                .writer(openApiJdbcWriter(openApiDongDataHolder(), jdbcTemplate))
+                .writer(openApiJdbcWriter())
                 .build();
+    }
+
+
+    @JobScope
+    @Bean
+    public OpenApiDongDataHolder openApiDongDataHolder() {
+        return new OpenApiDongDataHolder(dongRepository);
     }
 
     @Bean
@@ -55,14 +61,7 @@ public class OpenApiBatchConfiguration {
 
     @StepScope
     @Bean
-    public OpenApiJdbcWriter openApiJdbcWriter(OpenApiDongDataHolder openApiDongDataHolder,
-                                               JdbcTemplate jdbcTemplate) {
-        return new OpenApiJdbcWriter(openApiDongDataHolder, jdbcTemplate);
-    }
-
-    @JobScope
-    @Bean
-    public OpenApiDongDataHolder openApiDongDataHolder() {
-        return new OpenApiDongDataHolder(dongRepository);
+    public OpenApiJdbcWriter openApiJdbcWriter() {
+        return new OpenApiJdbcWriter(openApiDongDataHolder(), jdbcTemplate);
     }
 }
