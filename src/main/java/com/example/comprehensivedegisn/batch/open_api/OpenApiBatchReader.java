@@ -1,7 +1,6 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
 import com.example.comprehensivedegisn.api.OpenApiClient;
-import com.example.comprehensivedegisn.api.OpenApiUtils;
 import com.example.comprehensivedegisn.api.dto.ApartmentDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +27,11 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
     public ApartmentDetailResponse read()  {
         ApartmentDetailResponse response = openApiClient.request(pageNo, contractDate, regionalCode);
 
-        if(OpenApiUtils.isLimitExceeded(response)) throw new RuntimeException("Limit Exceeded");
-        if(OpenApiUtils.isEndOfData(response)) return null;
+        if(response.isLimitExceeded()) throw new RuntimeException("Limit Exceeded");
+        if(response.isEndOfData()) return null;
 
         if(response.isEndOfPage()){
-            contractDate = OpenApiUtils.getPreMonthContractDate(contractDate);
+            contractDate = getPreMonthContractDate();
             pageNo = 1;
             return response;
         }
@@ -42,6 +41,9 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
         }
     }
 
+    private LocalDate getPreMonthContractDate() {
+        return contractDate.minusMonths(1);
+    }
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
