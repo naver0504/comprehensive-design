@@ -5,8 +5,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 
-import java.time.LocalDate;
-
 @JacksonXmlRootElement(localName = "item")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") String dealAmount,
@@ -37,17 +35,4 @@ public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") St
                               @JacksonXmlProperty(localName = "중개사소재지") String rdealerLawDnm,
                               @JacksonXmlProperty(localName = "등기일자") String registrationDate) {
 
-    public LocalDate getRegistrationDate() {
-        String[] yearMonthDay = registrationDate.split("\\.");
-        return LocalDate.of(getYearByRegistrationDate(Integer.parseInt(yearMonthDay[0])), Integer.parseInt(yearMonthDay[1]), Integer.parseInt(yearMonthDay[2]));
-    }
-
-    public int getYearByRegistrationDate(int year) {
-        int currentYear = LocalDate.now().getYear() - 2000;
-        if (year <= currentYear) {
-            return year + 2000;
-        } else {
-            return year + 1900;
-        }
-    }
 }
