@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
-import com.example.comprehensivedegisn.api.OpenApiClient;
-import com.example.comprehensivedegisn.api.dto.ApartmentDetailResponse;
+import com.example.comprehensivedegisn.batch.open_api.api.OpenApiClient;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ExecutionContext;
@@ -27,7 +27,13 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
     public ApartmentDetailResponse read()  {
         ApartmentDetailResponse response = openApiClient.request(pageNo, contractDate, regionalCode);
 
-        if(response.isLimitExceeded()) throw new RuntimeException("Limit Exceeded");
+        log.info("pageNo: {}, contractDate: {}", pageNo, contractDate);
+
+        if(response.isLimitExceeded()){
+            log.error("Limit Exceeded");
+            throw new RuntimeException("Limit Exceeded");
+        }
+
         if(response.isEndOfData()) return null;
 
         if(response.isEndOfPage()){

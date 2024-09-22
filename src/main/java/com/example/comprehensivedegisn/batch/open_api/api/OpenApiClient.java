@@ -1,7 +1,7 @@
-package com.example.comprehensivedegisn.api;
+package com.example.comprehensivedegisn.batch.open_api.api;
 
 
-import com.example.comprehensivedegisn.api.dto.ApartmentDetailResponse;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetailResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

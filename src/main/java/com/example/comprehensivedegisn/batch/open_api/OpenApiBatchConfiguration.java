@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
-import com.example.comprehensivedegisn.api.OpenApiClient;
-import com.example.comprehensivedegisn.api.dto.ApartmentDetailResponse;
+import com.example.comprehensivedegisn.batch.open_api.api.OpenApiClient;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetailResponse;
 import com.example.comprehensivedegisn.domain.repository.DongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -10,6 +10,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +35,7 @@ public class OpenApiBatchConfiguration {
     public Job simpleOpenApiJob(JobRepository jobRepository) {
         return new JobBuilder("simpleOpenApiJob", jobRepository)
                 .start(simpleOpenApiStep(jobRepository, platformTransactionManager))
+                .incrementer(new RunIdIncrementer())
                 .build();
     }
 
@@ -47,8 +49,8 @@ public class OpenApiBatchConfiguration {
     }
 
 
-    @JobScope
     @Bean
+    @JobScope
     public OpenApiDongDataHolder openApiDongDataHolder() {
         return new OpenApiDongDataHolder(dongRepository);
     }
@@ -59,8 +61,8 @@ public class OpenApiBatchConfiguration {
         return new OpenApiBatchReader(openApiClient);
     }
 
-    @StepScope
     @Bean
+    @StepScope
     public OpenApiJdbcWriter openApiJdbcWriter() {
         return new OpenApiJdbcWriter(openApiDongDataHolder(), jdbcTemplate);
     }

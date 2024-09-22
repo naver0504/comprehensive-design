@@ -1,8 +1,8 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
 
-import com.example.comprehensivedegisn.api.dto.ApartmentDetail;
-import com.example.comprehensivedegisn.api.dto.ApartmentDetailResponse;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetail;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetailResponse;
 import com.example.comprehensivedegisn.domain.DongEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.*;
@@ -58,7 +58,7 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
 
 
     @Override
-    public void write(Chunk<? extends ApartmentDetailResponse> chunk) throws Exception {
+    public void write(Chunk<? extends ApartmentDetailResponse> chunk)  {
         openApiDongDataHolder.init();
         ApartmentDetailResponse apartmentDetailResponse = chunk.getItems().get(0);
 

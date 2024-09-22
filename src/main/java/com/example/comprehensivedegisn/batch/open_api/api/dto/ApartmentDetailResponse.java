@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.api.dto;
+package com.example.comprehensivedegisn.batch.open_api.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;

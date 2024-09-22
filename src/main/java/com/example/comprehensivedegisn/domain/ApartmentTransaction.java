@@ -1,18 +1,14 @@
-package com.example.comprehensivedegisn.domain;//package com.example.comprehensivedegisn.domain;
-
-import com.example.comprehensivedegisn.api.dto.ApartmentDetail;
+package com.example.comprehensivedegisn.domain;
+import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetail;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Table(name = "apartment_transaction")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@Getter
 public class ApartmentTransaction {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
