@@ -84,4 +84,20 @@ public class BatchTest {
         jobExecution.getExecutionContext().entrySet().forEach(System.out::println);
         Assertions.assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     }
+
+    @Test
+    void testExcelJob() throws Exception {
+        Job job = beanFactory.getBean("excelWriterJob", Job.class);
+
+        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+        jobParametersBuilder.addString("regionalCode", Gu.강남구.getRegionalCode());
+        JobParameters jobParameters = jobParametersBuilder.toJobParameters();
+
+        jobLauncherTestUtils.setJob(job);
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParametersBuilder(jobExplorer)
+                .getNextJobParameters(job)
+                .addJobParameters(jobParameters)
+                .toJobParameters());
+
+        Assertions.assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);    }
 }
