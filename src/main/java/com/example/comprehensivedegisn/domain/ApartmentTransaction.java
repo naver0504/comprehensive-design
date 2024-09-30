@@ -34,6 +34,9 @@ public class ApartmentTransaction {
     private String registrationDate;
     private String rdealerLawDnm;
 
+    private String x;
+    private String y;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dong_entity_id")
     private DongEntity dongEntity;
@@ -61,5 +64,10 @@ public class ApartmentTransaction {
                 .rdealerLawDnm(apartmentDetail.rdealerLawDnm())
                 .dongEntity(dongEntity)
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.id);
     }
 }
