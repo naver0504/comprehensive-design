@@ -61,7 +61,7 @@ public class ExcelWriterBatchConfiguration {
         String[] fieldNames = fieldList.subList(1, fieldList.size() - 1).toArray(new String[0]);
         return new FlatFileItemWriterBuilder<ApartmentTransaction>()
                 .name("apartmentTransactionWriter")
-                .resource(new FileSystemResource("C:\\Users\\qortm\\intelliJ\\comprehensive-degisn\\src\\main\\resources\\static" + "/apartment_transaction_" + Gu.getGu(regionalCode) + ".txt"))
+                .resource(new FileSystemResource("C:\\Users\\qortm\\intelliJ\\comprehensive-degisn\\src\\main\\resources\\static" + "/apartment_transaction_" + Gu.getGuFromRegionalCode(regionalCode) + ".txt"))
                 .delimited()
                 .delimiter("|")
                 .names(fieldNames)
