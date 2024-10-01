@@ -1,8 +1,10 @@
 package com.example.comprehensivedegisn.batch.kakao_map.api;
 
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
+import com.example.comprehensivedegisn.batch.kakao_map.RoadNameCacheRepository;
 import com.example.comprehensivedegisn.batch.kakao_map.api.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.api.dto.Documents;
+import com.example.comprehensivedegisn.batch.kakao_map.api.dto.RoadNameLocationRecord;
 import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.domain.Gu;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -24,27 +28,29 @@ public class KaKaoApiClient {
     private final String QUERY_PREFIX = "서울 ";
 
     private final RestTemplate restTemplate;
+    private final RoadNameCacheRepository roadNameCacheRepository;
     private final KaKaoRestApiProperties kaKaoRestApiProperties;
 
 
     public ApartmentGeoRecord getGeoLocation(ApartmentTransaction apartmentTransaction) {
 
-        String roadName = createRoadName(apartmentTransaction);
-        Documents documents = restTemplate.exchange(createUri(roadName), HttpMethod.GET, createHttpEntity(), Documents.class).getBody();
-        if(!documents.isValid(roadName)) {
-            log.error(roadName);
-            log.error(documents.toString());
-            throw new IllegalArgumentException("Invalid response from KaKao API");
+        Optional<RoadNameLocationRecord> optionalLocationRecord = roadNameCacheRepository.findByRoadName(apartmentTransaction.getRoadName());
+        if (optionalLocationRecord.isPresent()) {
+            RoadNameLocationRecord locationRecord = optionalLocationRecord.get();
+            return new ApartmentGeoRecord(apartmentTransaction.getId(), locationRecord.x(), locationRecord.y());
         }
-        return documents.toApartmentGeoRecord(apartmentTransaction);
+
+        Documents documents = restTemplate.exchange(createUriWithRoadName(apartmentTransaction), HttpMethod.GET, createHttpEntity(), Documents.class).getBody();
+        ApartmentGeoRecord apartmentGeoRecord = documents.toApartmentGeoRecord(apartmentTransaction);
+        roadNameCacheRepository.save(apartmentTransaction.getRoadName(), new RoadNameLocationRecord(apartmentGeoRecord.x(), apartmentGeoRecord.y()));
+        return apartmentGeoRecord;
     }
 
-    public String createRoadName(ApartmentTransaction apartmentTransaction) {
-        return QUERY_PREFIX + Gu.getGuFromRegionalCode(regionalCode) + " " + apartmentTransaction.getRoadName();
-    }
 
-    public String createUri(String roadName) {
-        return kaKaoRestApiProperties.url() + "?query=" + roadName;
+
+    public String createUriWithRoadName(ApartmentTransaction apartmentTransaction) {
+        return kaKaoRestApiProperties.url() + "?query="
+                + QUERY_PREFIX + Gu.getGuFromRegionalCode(regionalCode) + " " + apartmentTransaction.getRoadName();
     }
 
     public HttpEntity<String> createHttpEntity() {
