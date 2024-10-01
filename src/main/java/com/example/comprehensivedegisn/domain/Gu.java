@@ -10,6 +10,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public enum Gu {
 
+
     강남구("11680"), 강동구("11740"), 강북구("11305"), 강서구("11500"),
     관악구("11620"), 광진구("11215"), 구로구("11530"), 금천구("11545"),
     노원구("11350"), 도봉구("11320"), 동대문구("11230"), 동작구("11590"),
@@ -22,11 +23,11 @@ public enum Gu {
 
     private static List<Gu> guList = List.of(Gu.values());
 
-    public static Gu getGu(String guName) {
+    public static Gu getGuFromRegionalCode(String regionalCode) {
         return guList.stream()
-                .filter(gu -> Objects.equals(gu.getRegionalCode(), guName))
+                .filter(gu -> Objects.equals(gu.getRegionalCode(), regionalCode))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 구가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 구가 없습니다. " + regionalCode));
     }
 
 }
