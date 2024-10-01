@@ -83,7 +83,7 @@ public class KaKaoMapBatchConfiguration {
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
-        // size 5부터  Too Many Request Error 발생
+        // size 5부터 메모리 사용량 94퍼
         threadPoolTaskExecutor.setCorePoolSize(5);
 
         //corePoolSize 만큼 thread 를 미리 생성한다.
