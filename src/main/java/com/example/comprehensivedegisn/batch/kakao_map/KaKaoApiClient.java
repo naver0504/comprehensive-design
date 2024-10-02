@@ -1,10 +1,8 @@
-package com.example.comprehensivedegisn.batch.kakao_map.api;
+package com.example.comprehensivedegisn.batch.kakao_map;
 
-import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
-import com.example.comprehensivedegisn.batch.kakao_map.RoadNameCacheRepository;
-import com.example.comprehensivedegisn.batch.kakao_map.api.dto.ApartmentGeoRecord;
-import com.example.comprehensivedegisn.batch.kakao_map.api.dto.Documents;
-import com.example.comprehensivedegisn.batch.kakao_map.api.dto.RoadNameLocationRecord;
+import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
+import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
+import com.example.comprehensivedegisn.batch.kakao_map.dto.RoadNameLocationRecord;
 import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.domain.Gu;
 import lombok.RequiredArgsConstructor;

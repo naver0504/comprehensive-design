@@ -1,7 +1,6 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
-import com.example.comprehensivedegisn.batch.open_api.api.OpenApiClient;
-import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetailResponse;
+import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import com.example.comprehensivedegisn.domain.repository.DongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;

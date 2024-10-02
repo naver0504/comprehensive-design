@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.kakao_map.api.dto;
+package com.example.comprehensivedegisn.batch.kakao_map.dto;
 
 import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import com.fasterxml.jackson.annotation.JsonProperty;

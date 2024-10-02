@@ -1,7 +1,6 @@
 package com.example.comprehensivedegisn.batch.kakao_map;
 
-import com.example.comprehensivedegisn.batch.kakao_map.api.KaKaoApiClient;
-import com.example.comprehensivedegisn.batch.kakao_map.api.dto.ApartmentGeoRecord;
+import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +77,6 @@ public class KaKaoMapBatchConfiguration {
     //하지만 기본 값이 Integer.MAX_VALUE 이기 때문에 queue 가 꽉 차지 않는 한 maxPoolSize 만큼 thread 를 생성하지 않는다.
     //적절한 queueCapacity 를 설정해야 하지만 단순한 작업이기 때문에
     //corePoolSize만 사용하도록 설정한다.
-
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();

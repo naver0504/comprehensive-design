@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.kakao_map;
 
 
-import com.example.comprehensivedegisn.batch.kakao_map.api.dto.RoadNameLocationRecord;
+import com.example.comprehensivedegisn.batch.kakao_map.dto.RoadNameLocationRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 

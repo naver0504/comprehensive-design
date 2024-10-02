@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.open_api.api;
+package com.example.comprehensivedegisn.batch.open_api;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

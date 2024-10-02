@@ -1,5 +1,5 @@
 package com.example.comprehensivedegisn.domain;
-import com.example.comprehensivedegisn.batch.open_api.api.dto.ApartmentDetail;
+import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetail;
 import jakarta.persistence.*;
 import lombok.*;
 
