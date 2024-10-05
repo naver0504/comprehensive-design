@@ -32,8 +32,8 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                     "build_year, " +
                     "deal_year, " +
                     "road_name, " +
-                    "road_name_seq, " +
-                    "road_name_basement_code, " +
+                    "road_name_bonbun, " +
+                    "road_name_bubun, " +
                     "road_name_code, " +
                     "dong, " +
                     "bonbun, " +
@@ -72,8 +72,8 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                         ps.setInt(2, apartmentDetail.buildYear());
                         ps.setInt(3, apartmentDetail.dealYear());
                         ps.setString(4, apartmentDetail.roadName());
-                        ps.setInt(5, apartmentDetail.roadNameSeq());
-                        ps.setInt(6, apartmentDetail.roadNameBasementCode());
+                        ps.setInt(5, apartmentDetail.roadNameBonbun());
+                        ps.setInt(6, apartmentDetail.roadNameBubun());
                         ps.setInt(7, apartmentDetail.roadNameCode());
                         ps.setString(8, apartmentDetail.dong());
                         ps.setInt(9, apartmentDetail.bonbun());
