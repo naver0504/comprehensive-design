@@ -9,11 +9,7 @@ public record Document(@JsonProperty("address_name") String addressName,
                        String x,
                        String y) {
 
-    public boolean isValid(String roadName) {
-        return Objects.equals(addressName(), roadName) && addressType() == AddressType.ROAD;
-    }
-
     private enum AddressType {
-        ROAD
+        ROAD_ADDR
     }
 }
