@@ -17,8 +17,8 @@ public class ApartmentTransaction {
     private int buildYear;
     private int dealYear;
     private String roadName;
-    private Integer roadNameBonbun;
-    private Integer roadNameBubun;
+    private int roadNameBonbun;
+    private int roadNameBubun;
     private int roadNameCode;
     private String dong;
     private int bonbun;
@@ -43,5 +43,13 @@ public class ApartmentTransaction {
     @Override
     public String toString() {
         return String.valueOf(this.id);
+    }
+
+    public String getRoadName() {
+        return roadName + " " + roadNameBonbun + getRoadNameBubun();
+    }
+
+    private String getRoadNameBubun() {
+        return this.roadNameBubun == 0 ? "" : "-" + this.roadNameBubun;
     }
 }
