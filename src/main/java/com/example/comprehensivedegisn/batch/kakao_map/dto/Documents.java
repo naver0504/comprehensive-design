@@ -7,11 +7,11 @@ import java.util.List;
 
 public record Documents(List<Document> documents, Meta meta) {
 
-    public ApartmentGeoRecord toApartmentGeoRecord(ApartmentTransaction apartmentTransaction) {
+    public RoadNameLocationRecord toRoadNameLocationRecord() {
         if(documents.isEmpty()) {
-            return new ApartmentGeoRecord(apartmentTransaction.getId(), null, null);
+            return RoadNameLocationRecord.EMPTY;
         }
-        return new ApartmentGeoRecord(apartmentTransaction.getId(), documents.get(0).x(), documents.get(0).y());
+        return new RoadNameLocationRecord(documents.get(0).x(), documents.get(0).y());
     }
 
     public record Meta(@JsonProperty("is_end") boolean isEnd,
