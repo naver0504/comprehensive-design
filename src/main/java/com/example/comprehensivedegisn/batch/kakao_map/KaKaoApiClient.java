@@ -13,8 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-
 @RequiredArgsConstructor
 @Slf4j
 public class KaKaoApiClient {
@@ -32,23 +30,19 @@ public class KaKaoApiClient {
 
     public ApartmentGeoRecord getGeoLocation(ApartmentTransaction apartmentTransaction) {
 
-        Optional<RoadNameLocationRecord> optionalLocationRecord = roadNameCacheRepository.findByRoadName(apartmentTransaction.getRoadName());
-        if (optionalLocationRecord.isPresent()) {
-            RoadNameLocationRecord locationRecord = optionalLocationRecord.get();
-            return new ApartmentGeoRecord(apartmentTransaction.getId(), locationRecord.x(), locationRecord.y());
-        }
+        RoadNameLocationRecord roadNameLocationRecord = roadNameCacheRepository.computeIfAbsent(apartmentTransaction.getRoadName(), roadNm -> {
+            Documents documents = restTemplate.exchange(createUriWithRoadName(roadNm), HttpMethod.GET, createHttpEntity(), Documents.class).getBody();
+            return documents.toRoadNameLocationRecord();
+        });
 
-        Documents documents = restTemplate.exchange(createUriWithRoadName(apartmentTransaction), HttpMethod.GET, createHttpEntity(), Documents.class).getBody();
-        ApartmentGeoRecord apartmentGeoRecord = documents.toApartmentGeoRecord(apartmentTransaction);
-        roadNameCacheRepository.save(apartmentTransaction.getRoadName(), new RoadNameLocationRecord(apartmentGeoRecord.x(), apartmentGeoRecord.y()));
-        return apartmentGeoRecord;
+        return roadNameLocationRecord.toApartmentGeoRecord(apartmentTransaction.getId());
     }
 
 
 
-    public String createUriWithRoadName(ApartmentTransaction apartmentTransaction) {
+    public String createUriWithRoadName(String roadName) {
         return kaKaoRestApiProperties.url() + "?query="
-                + QUERY_PREFIX + Gu.getGuFromRegionalCode(regionalCode) + " " + apartmentTransaction.getRoadName();
+                + QUERY_PREFIX + Gu.getGuFromRegionalCode(regionalCode) + " " + roadName;
     }
 
     public HttpEntity<String> createHttpEntity() {
