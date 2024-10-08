@@ -1,6 +1,7 @@
-package com.example.comprehensivedegisn.batch.kakao_map;
+package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
 import com.example.comprehensivedegisn.domain.Gu;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @SpringBatchTest
+@ActiveProfiles("prod")
 class KaKaoMapBatchConfigurationTest {
 
     @Autowired
@@ -26,11 +28,17 @@ class KaKaoMapBatchConfigurationTest {
     private JobRepositoryTestUtils jobRepositoryTestUtils;
 
 
+    @BeforeEach
+    public void clearMetadata() {
+        jobRepositoryTestUtils.removeJobExecutions();
+    }
     @Test
     public void readerTest() throws Exception {
-        Job job = beanFactory.getBean("kakaoMapJob", Job.class);
+
+
+        Job job = beanFactory.getBean("kakaoMapJobWithRoadName", Job.class);
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-        jobParametersBuilder.addString("regionalCode", Gu.강남구.getRegionalCode());
+        jobParametersBuilder.addString("regionalCode", Gu.송파구.getRegionalCode());
         JobParameters jobParameters = jobParametersBuilder.toJobParameters();
 
         jobLauncherTestUtils.setJob(job);
