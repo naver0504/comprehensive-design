@@ -45,6 +45,10 @@ public class ApartmentTransaction {
         return String.valueOf(this.id);
     }
 
+    public String getRoadNameWithGu(Gu gu) {
+        return gu + " " + getRoadName();
+    }
+
     public String getRoadName() {
         return roadName + " " + roadNameBonbun + getRoadNameBubun();
     }
