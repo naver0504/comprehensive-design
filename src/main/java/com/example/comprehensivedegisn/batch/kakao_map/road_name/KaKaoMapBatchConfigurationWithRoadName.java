@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -37,7 +36,7 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 @Slf4j
 @Import(KaKaoMapBaseConfiguration.class)
-public class KaKaoMapBatchConfigurationWithRoadName extends WebMvcConfigurationSupport {
+public class KaKaoMapBatchConfigurationWithRoadName {
 
     private final String JOB_NAME = "kakaoMapJobWithRoadName";
     private final String STEP_NAME = JOB_NAME + "_step";
