@@ -10,6 +10,6 @@ public record Document(@JsonProperty("address_name") String addressName,
                        String y) {
 
     private enum AddressType {
-        ROAD_ADDR
+        ROAD_ADDR, REGION_ADDR
     }
 }
