@@ -59,7 +59,6 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
 
     @Override
     public void write(Chunk<? extends ApartmentDetailResponse> chunk)  {
-        openApiDongDataHolder.init();
         ApartmentDetailResponse apartmentDetailResponse = chunk.getItems().get(0);
 
         List<ApartmentDetail> items = apartmentDetailResponse.body().items();
