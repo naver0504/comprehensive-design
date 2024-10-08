@@ -3,6 +3,7 @@ package com.example.comprehensivedegisn.batch.open_api;
 
 import com.example.comprehensivedegisn.domain.DongEntity;
 import com.example.comprehensivedegisn.domain.repository.DongRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ public class OpenApiDongDataHolder {
     private Map<String, Map<String, DongEntity>> dongMap;
 
 
+    @PostConstruct
     public void init(){
         if(isDataHolderReady()) return;
 
