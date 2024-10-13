@@ -42,16 +42,19 @@ public class KaKaoMapBaseConfiguration {
     //하지만 기본 값이 Integer.MAX_VALUE 이기 때문에 queue 가 꽉 차지 않는 한 maxPoolSize 만큼 thread 를 생성하지 않는다.
     //적절한 queueCapacity 를 설정해야 하지만 단순한 작업이기 때문에
     //corePoolSize만 사용하도록 설정한다.
-    @Bean
-    @StepScope
+    @Bean(name = "kakaoMapTaskExecutor")
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
         // size 5부터 메모리 사용량 94퍼
         threadPoolTaskExecutor.setCorePoolSize(6);
-
         //corePoolSize 만큼 thread 를 미리 생성한다.
-        threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
+//        threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
+
+        //corePoolSize 만큼 thread 를 미리 생성하지 않는걸로 수정
+        //싱글톤 빈으로 등록되어 있기 때문에 미리 생성하지 않는다.
+        threadPoolTaskExecutor.setPrestartAllCoreThreads(false);
+        threadPoolTaskExecutor.setThreadNamePrefix("kakaoMapTaskExecutor-");
         return threadPoolTaskExecutor;
     }
 

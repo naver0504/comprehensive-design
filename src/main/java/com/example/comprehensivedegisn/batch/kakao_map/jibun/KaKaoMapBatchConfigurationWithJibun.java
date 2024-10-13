@@ -24,6 +24,7 @@ import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,6 @@ import static com.example.comprehensivedegisn.domain.QDongEntity.dongEntity;
 
 @Configuration
 @EnableConfigurationProperties(KaKaoRestApiProperties.class)
-@RequiredArgsConstructor
 @Import(KaKaoMapBaseConfiguration.class)
 public class KaKaoMapBatchConfigurationWithJibun {
 
@@ -57,6 +57,24 @@ public class KaKaoMapBatchConfigurationWithJibun {
     private final CacheRepository<String, LocationRecord> cacheRepository;
     private final TaskExecutor taskExecutor;
 
+
+    public KaKaoMapBatchConfigurationWithJibun(EntityManagerFactory emf,
+                                               JobRepository jobRepository,
+                                               PlatformTransactionManager platformTransactionManager,
+                                               KaKaoRestApiProperties kaKaoRestApiProperties,
+                                               ItemWriter<Future<ApartmentGeoRecord>> kaKaoMapWriter,
+                                               RestTemplate restTemplate,
+                                               CacheRepository<String, LocationRecord> cacheRepository,
+                                               @Qualifier("kakaoMapTaskExecutor") TaskExecutor taskExecutor) {
+        this.emf = emf;
+        this.jobRepository = jobRepository;
+        this.platformTransactionManager = platformTransactionManager;
+        this.kaKaoRestApiProperties = kaKaoRestApiProperties;
+        this.kaKaoMapWriter = kaKaoMapWriter;
+        this.restTemplate = restTemplate;
+        this.cacheRepository = cacheRepository;
+        this.taskExecutor = taskExecutor;
+    }
 
     @Bean(name = STEP_NAME + " KaKaoApiClient")
     @StepScope
