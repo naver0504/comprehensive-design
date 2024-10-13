@@ -9,36 +9,43 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
-
-@EnableBatchProcessing
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties(OpenAPiProperties.class)
 public class OpenApiBatchConfiguration {
 
-    private final OpenApiClient openApiClient;
+    private static final String JOB_NAME = "simpleOpenApiJob";
+    private static final String STEP_NAME = JOB_NAME + "Step";
+
+    private final OpenAPiProperties openAPiProperties;
     private final PlatformTransactionManager platformTransactionManager;
     private final JdbcTemplate jdbcTemplate;
     private final DongRepository dongRepository;
 
     public static int CHUNK_SIZE = 1;
 
-    @Bean(name = "simpleOpenApiJob")
+    @Bean
+    @JobScope
+    public OpenApiClient openApiClient() {
+        return new OpenApiClient(openAPiProperties);
+    }
+
+    @Bean(name = JOB_NAME)
     public Job simpleOpenApiJob(JobRepository jobRepository) {
         return new JobBuilder("simpleOpenApiJob", jobRepository)
                 .start(simpleOpenApiStep(jobRepository, platformTransactionManager))
-                .incrementer(new RunIdIncrementer())
                 .build();
     }
 
-    @Bean
+    @Bean(name = STEP_NAME)
     public Step simpleOpenApiStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
         return new StepBuilder("simpleOpenApiStep", jobRepository)
                 .<ApartmentDetailResponse, ApartmentDetailResponse>chunk(CHUNK_SIZE, platformTransactionManager)
@@ -46,7 +53,6 @@ public class OpenApiBatchConfiguration {
                 .writer(openApiJdbcWriter())
                 .build();
     }
-
 
     @Bean
     @JobScope
@@ -57,7 +63,7 @@ public class OpenApiBatchConfiguration {
     @Bean
     @StepScope
     public OpenApiBatchReader simpleOpenApiReader() {
-        return new OpenApiBatchReader(openApiClient);
+        return new OpenApiBatchReader(openApiClient());
     }
 
     @Bean

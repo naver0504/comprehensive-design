@@ -16,13 +16,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 
-@Component
 @RequiredArgsConstructor
-@EnableConfigurationProperties(OpenAPiProperties.class)
 @Slf4j
 public class OpenApiClient {
 
-    private final int NUM_OF_ROWS = 1000;
+    private static final int NUM_OF_ROWS = 1000;
     private final OpenAPiProperties openAPiProperties;
 
     public ApartmentDetailResponse request(int pageNo, LocalDate contractDate, String regionalCode) {
