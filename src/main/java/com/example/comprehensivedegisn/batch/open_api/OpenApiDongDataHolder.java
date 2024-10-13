@@ -18,15 +18,9 @@ public class OpenApiDongDataHolder {
 
     @PostConstruct
     public void init(){
-        if(isDataHolderReady()) return;
-
         dongMap = dongRepository.findAll().stream()
                 .collect(Collectors.groupingBy(dongEntity -> dongEntity.getGu().getRegionalCode(),
                         Collectors.toMap(DongEntity::getDongCode, dongEntity -> dongEntity)));
-    }
-
-    public boolean isDataHolderReady(){
-        return dongMap != null;
     }
 
     public DongEntity getDongEntity(String regionalCode, String dongCode){
