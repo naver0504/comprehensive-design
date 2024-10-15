@@ -29,6 +29,7 @@ public class OpenApiClient implements ApiClient<OpenApiRequest, ApartmentDetailR
 
     @Override
     public ApartmentDetailResponse callApi(OpenApiRequest openApiRequest) {
+        //URI.create()를 사용하지 않고 String Type을 넣으면 serviceKey에 특수문자가 들어가면 RestTemplate이 인코딩을 해버림
         return restTemplate.getForObject(URI.create(createUrl(openApiRequest)), ApartmentDetailResponse.class);
     }
 }
