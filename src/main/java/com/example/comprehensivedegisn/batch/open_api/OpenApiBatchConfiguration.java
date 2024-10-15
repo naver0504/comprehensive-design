@@ -1,11 +1,11 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
+import com.example.comprehensivedegisn.batch.api_client.OpenApiClient;
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import com.example.comprehensivedegisn.domain.repository.DongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,18 +25,19 @@ public class OpenApiBatchConfiguration {
 
     private static final String JOB_NAME = "simpleOpenApiJob";
     private static final String STEP_NAME = JOB_NAME + "Step";
+    private static final int CHUNK_SIZE = 1;
 
     private final OpenAPiProperties openAPiProperties;
     private final PlatformTransactionManager platformTransactionManager;
     private final JdbcTemplate jdbcTemplate;
     private final DongRepository dongRepository;
+    private final RestTemplate restTemplate;
 
-    public static int CHUNK_SIZE = 1;
 
     @Bean
     @JobScope
     public OpenApiClient openApiClient() {
-        return new OpenApiClient(openAPiProperties);
+        return new OpenApiClient(openAPiProperties, restTemplate);
     }
 
     @Bean(name = JOB_NAME)
