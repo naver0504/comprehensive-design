@@ -1,7 +1,6 @@
-package com.example.comprehensivedegisn.batch.kakao_map.road_name;
+package com.example.comprehensivedegisn.batch.api_client;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
-import com.example.comprehensivedegisn.batch.kakao_map.api_client.AbstractKaKaoApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
@@ -14,7 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-public class KaKaoApiClientWithRoadName extends AbstractKaKaoApiClient<ApartmentTransaction, ApartmentGeoRecord> {
+public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransaction, ApartmentGeoRecord> {
 
     @Value("#{jobParameters[regionalCode]}")
     private String regionalCode;
@@ -37,7 +36,7 @@ public class KaKaoApiClientWithRoadName extends AbstractKaKaoApiClient<Apartment
                 roadNm -> {
                     Documents documents = restTemplate
                             .exchange(
-                                    createUrl(apartmentTransaction.getRoadNameWithGu(Gu.getGuFromRegionalCode(regionalCode))),
+                                    createUrl(apartmentTransaction),
                                     HttpMethod.GET,
                                     createHttpEntity(),
                                     Documents.class)
@@ -45,5 +44,10 @@ public class KaKaoApiClientWithRoadName extends AbstractKaKaoApiClient<Apartment
                     return documents.toLocationRecord();
                 });
         return roadNameLocationRecord.toApartmentGeoRecord(apartmentTransaction.getId());
+    }
+
+    @Override
+    protected String getLocation(ApartmentTransaction apartmentTransaction) {
+        return apartmentTransaction.getRoadNameWithGu(Gu.getGuFromRegionalCode(regionalCode));
     }
 }
