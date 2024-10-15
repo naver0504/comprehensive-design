@@ -1,7 +1,9 @@
 package com.example.comprehensivedegisn.batch.kakao_map.jibun;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
+import com.example.comprehensivedegisn.batch.api_client.KaKaoApiClientWithJibun;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoMapBaseConfiguration;
+import com.example.comprehensivedegisn.batch.api_client.ApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
@@ -9,10 +11,8 @@ import com.example.comprehensivedegisn.batch.kakao_map.dto.TransactionWithGu;
 import com.example.comprehensivedegisn.batch.query_dsl.QuerydslNoOffsetIdPagingItemReader;
 import com.example.comprehensivedegisn.batch.query_dsl.expression.Expression;
 import com.example.comprehensivedegisn.batch.query_dsl.options.QuerydslNoOffsetNumberOptions;
-import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -23,7 +23,6 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,9 +42,9 @@ import static com.example.comprehensivedegisn.domain.QDongEntity.dongEntity;
 @Import(KaKaoMapBaseConfiguration.class)
 public class KaKaoMapBatchConfigurationWithJibun {
 
-    private final String JOB_NAME = "kakaoMapJobWithJibun";
-    private final String STEP_NAME = JOB_NAME + "_step";
-    private int chunkSize = 1000;
+    private static final int CHUNK_SIZE = 1000;
+    private static final String JOB_NAME = "kakaoMapJobWithJibun";
+    private static final String STEP_NAME = JOB_NAME + "_step";
 
     private final EntityManagerFactory emf;
     private final JobRepository jobRepository;
@@ -76,24 +75,10 @@ public class KaKaoMapBatchConfigurationWithJibun {
         this.taskExecutor = taskExecutor;
     }
 
-    @Bean(name = STEP_NAME + " KaKaoApiClient")
+    @Bean(name = STEP_NAME + " ApiClient")
     @StepScope
     public KaKaoApiClientWithJibun kaKaoApiClient() {
         return new KaKaoApiClientWithJibun(kaKaoRestApiProperties, restTemplate, cacheRepository);
-    }
-
-
-    public JpaPagingItemReader<ApartmentTransaction> jpaApartmentTransactionReader() {
-        JpaPagingItemReader<ApartmentTransaction> reader = new JpaPagingItemReader<>() {
-            @Override
-            public int getPage() {
-                return 0;
-            }
-        };
-        reader.setEntityManagerFactory(emf);
-        reader.setQueryString("SELECT a FROM ApartmentTransaction a where a.x is null and a.y is null order by a.id asc");
-        reader.setPageSize(chunkSize);
-        return reader;
     }
 
     @Bean(name = STEP_NAME + " Reader")
@@ -103,12 +88,12 @@ public class KaKaoMapBatchConfigurationWithJibun {
         QuerydslNoOffsetNumberOptions<TransactionWithGu, Long> options =
                 new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
 
-        return new QuerydslNoOffsetIdPagingItemReader<>(emf, chunkSize, options, query -> query
+        return new QuerydslNoOffsetIdPagingItemReader<>(emf, CHUNK_SIZE, options, query -> query
                 .select(Projections.constructor(
                         TransactionWithGu.class,
                         apartmentTransaction.id,
                         dongEntity.gu,
-                        apartmentTransaction.dong,
+                        apartmentTransaction.aptDong,
                         apartmentTransaction.jibun)
                 )
                 .from(apartmentTransaction)
@@ -121,7 +106,7 @@ public class KaKaoMapBatchConfigurationWithJibun {
 
     @Bean(name = STEP_NAME + " Processor")
     @StepScope
-    public ItemProcessor<TransactionWithGu, ApartmentGeoRecord> kaKaoMapProcessor(KaKaoApiClientWithJibun kaKaoApiClient) {
+    public ItemProcessor<TransactionWithGu, ApartmentGeoRecord> kaKaoMapProcessor(ApiClient<TransactionWithGu, ApartmentGeoRecord> kaKaoApiClient) {
         return kaKaoApiClient::callApi;
     }
 
@@ -138,7 +123,7 @@ public class KaKaoMapBatchConfigurationWithJibun {
     @Bean(name = STEP_NAME)
     public Step kaKaoMapStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<TransactionWithGu, Future<ApartmentGeoRecord>>chunk(chunkSize, platformTransactionManager)
+                .<TransactionWithGu, Future<ApartmentGeoRecord>>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(querydslPagingItemReader())
                 .processor(asyncKaKaoMapProcessor())
                 .writer(kaKaoMapWriter)

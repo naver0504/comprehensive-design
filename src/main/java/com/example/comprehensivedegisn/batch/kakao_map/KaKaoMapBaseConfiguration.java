@@ -28,12 +28,6 @@ public class KaKaoMapBaseConfiguration {
 
     @Bean
     @StepScope
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @Bean
-    @StepScope
     public CacheRepository<String, LocationRecord> cacheRepository() {
         return new LocationRecordCacheRepository();
     }

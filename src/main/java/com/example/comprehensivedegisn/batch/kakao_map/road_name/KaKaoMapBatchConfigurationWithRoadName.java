@@ -1,13 +1,14 @@
 package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
+import com.example.comprehensivedegisn.batch.api_client.KaKaoApiClientWithRoadName;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoMapBaseConfiguration;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
+import com.example.comprehensivedegisn.batch.api_client.ApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
 import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -38,9 +39,9 @@ import java.util.concurrent.Future;
 @Import(KaKaoMapBaseConfiguration.class)
 public class KaKaoMapBatchConfigurationWithRoadName {
 
-    private final String JOB_NAME = "kakaoMapJobWithRoadName";
-    private final String STEP_NAME = JOB_NAME + "_step";
-    private int chunkSize = 1000;
+    private static final String JOB_NAME = "kakaoMapJobWithRoadName";
+    private static final String STEP_NAME = JOB_NAME + "_step";
+    private static final int CHUNK_SIZE = 1000;
 
     private final EntityManagerFactory emf;
     private final JobRepository jobRepository;
@@ -54,13 +55,14 @@ public class KaKaoMapBatchConfigurationWithRoadName {
 
 
     public KaKaoMapBatchConfigurationWithRoadName(EntityManagerFactory emf,
-                                               JobRepository jobRepository,
-                                               PlatformTransactionManager platformTransactionManager,
-                                               KaKaoRestApiProperties kaKaoRestApiProperties,
-                                               ItemWriter<Future<ApartmentGeoRecord>> kaKaoMapWriter,
-                                               RestTemplate restTemplate,
-                                               CacheRepository<String, LocationRecord> cacheRepository,
-                                               @Qualifier("kakaoMapTaskExecutor") TaskExecutor taskExecutor) {
+                                                  JobRepository jobRepository,
+                                                  PlatformTransactionManager platformTransactionManager,
+                                                  KaKaoRestApiProperties kaKaoRestApiProperties,
+                                                  ItemWriter<Future<ApartmentGeoRecord>> kaKaoMapWriter,
+                                                  RestTemplate restTemplate,
+                                                  CacheRepository<String, LocationRecord> cacheRepository,
+                                                  @Qualifier("kakaoMapTaskExecutor") TaskExecutor taskExecutor) {
+
         this.emf = emf;
         this.jobRepository = jobRepository;
         this.platformTransactionManager = platformTransactionManager;
@@ -71,7 +73,7 @@ public class KaKaoMapBatchConfigurationWithRoadName {
         this.taskExecutor = taskExecutor;
     }
 
-    @Bean(name = STEP_NAME + " KaKaoApiClient")
+    @Bean(name = STEP_NAME + " ApiClient")
     @StepScope
     public KaKaoApiClientWithRoadName kaKaoApiClient() {
         return new KaKaoApiClientWithRoadName(kaKaoRestApiProperties, restTemplate, cacheRepository);
@@ -84,13 +86,13 @@ public class KaKaoMapBatchConfigurationWithRoadName {
         reader.setEntityManagerFactory(emf);
         reader.setQueryString("SELECT a FROM ApartmentTransaction a join DongEntity d on a.dongEntity.id = d.id where d.guCode = :guCode order by a.id asc");
         reader.setParameterValues(Map.of("guCode", guCode));
-        reader.setPageSize(chunkSize);
+        reader.setPageSize(CHUNK_SIZE);
         return reader;
     }
 
     @Bean(name = STEP_NAME + " Processor")
     @StepScope
-    public ItemProcessor<ApartmentTransaction, ApartmentGeoRecord> kaKaoMapProcessor(KaKaoApiClientWithRoadName kaKaoApiClient) {
+    public ItemProcessor<ApartmentTransaction, ApartmentGeoRecord> kaKaoMapProcessor(ApiClient<ApartmentTransaction, ApartmentGeoRecord> kaKaoApiClient) {
         return kaKaoApiClient::callApi;
     }
 
@@ -106,7 +108,7 @@ public class KaKaoMapBatchConfigurationWithRoadName {
     @Bean(name = STEP_NAME)
     public Step kaKaoMapStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<ApartmentTransaction, Future<ApartmentGeoRecord>>chunk(chunkSize, platformTransactionManager)
+                .<ApartmentTransaction, Future<ApartmentGeoRecord>>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(jpaApartmentTransactionReader(null))
                 .processor(asyncKaKaoMapProcessor())
                 .writer(kaKaoMapWriter)

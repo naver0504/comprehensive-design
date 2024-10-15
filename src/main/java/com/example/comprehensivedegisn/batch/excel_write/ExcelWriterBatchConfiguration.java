@@ -33,10 +33,10 @@ import static com.example.comprehensivedegisn.domain.QDongEntity.*;
 @RequiredArgsConstructor
 public class ExcelWriterBatchConfiguration {
 
+    private static final String JOB_NAME = "excelWriterJob";
+    private static final String STEP_NAME = JOB_NAME + "_step";
+    private static final int chunkSize = 1000;
 
-    private final String JOB_NAME = "excelWriterJob";
-    private final String STEP_NAME = JOB_NAME + "_step";
-    private int chunkSize = 1000;
     private final EntityManagerFactory emf;
     private final JobRepository jobRepository;
     private final PlatformTransactionManager platformTransactionManager;
