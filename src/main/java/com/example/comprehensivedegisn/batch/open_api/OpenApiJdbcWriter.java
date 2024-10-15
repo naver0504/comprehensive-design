@@ -17,11 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
 
-
-
     private final OpenApiDongDataHolder openApiDongDataHolder;
     private final JdbcTemplate jdbcTemplate;
-
 
     @Value("#{jobParameters[regionalCode]}")
     private String regionalCode;
@@ -64,38 +61,36 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
         List<ApartmentDetail> items = apartmentDetailResponse.body().items();
 
         jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ApartmentDetail apartmentDetail = items.get(i);
-                        ps.setString(1, apartmentDetail.dealAmount());
-                        ps.setInt(2, apartmentDetail.buildYear());
-                        ps.setInt(3, apartmentDetail.dealYear());
-                        ps.setString(4, apartmentDetail.roadName());
-                        ps.setInt(5, apartmentDetail.roadNameBonbun());
-                        ps.setInt(6, apartmentDetail.roadNameBubun());
-                        ps.setInt(7, apartmentDetail.roadNameCode());
-                        ps.setString(8, apartmentDetail.dong());
-                        ps.setInt(9, apartmentDetail.bonbun());
-                        ps.setInt(10, apartmentDetail.bubun());
-                        ps.setInt(11, apartmentDetail.landCode());
-                        ps.setString(12, apartmentDetail.apartmentName());
-                        ps.setInt(13, apartmentDetail.dealMonth());
-                        ps.setInt(14, apartmentDetail.dealDay());
-                        ps.setDouble(15, apartmentDetail.areaForExclusiveUse());
-                        ps.setString(16, apartmentDetail.jibun());
-                        ps.setInt(17, apartmentDetail.floor());
-                        ps.setString(18, apartmentDetail.registrationDate());
-                        ps.setString(19, apartmentDetail.rdealerLawDnm());
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ApartmentDetail apartmentDetail = items.get(i);
+                ps.setString(1, apartmentDetail.dealAmount().trim());
+                ps.setInt(2, apartmentDetail.buildYear());
+                ps.setInt(3, apartmentDetail.dealYear());
+                ps.setString(4, apartmentDetail.roadName().trim());
+                ps.setInt(5, apartmentDetail.roadNameBonbun());
+                ps.setInt(6, apartmentDetail.roadNameBubun());
+                ps.setInt(7, apartmentDetail.roadNameCode());
+                ps.setString(8, apartmentDetail.dong().trim());
+                ps.setInt(9, apartmentDetail.bonbun());
+                ps.setInt(10, apartmentDetail.bubun());
+                ps.setInt(11, apartmentDetail.landCode());
+                ps.setString(12, apartmentDetail.apartmentName().trim());
+                ps.setInt(13, apartmentDetail.dealMonth());
+                ps.setInt(14, apartmentDetail.dealDay());
+                ps.setDouble(15, apartmentDetail.areaForExclusiveUse());
+                ps.setString(16, apartmentDetail.jibun().trim());
+                ps.setInt(17, apartmentDetail.floor());
+                ps.setString(18, apartmentDetail.registrationDate());
+                ps.setString(19, apartmentDetail.rdealerLawDnm());
+                DongEntity dongEntity = openApiDongDataHolder.getDongEntity(regionalCode, apartmentDetail.eupmyeondongCode().trim());
+                ps.setLong(20, dongEntity.getId());
+            }
 
-                        DongEntity dongEntity = openApiDongDataHolder.getDongEntity(regionalCode, apartmentDetail.eupmyeondongCode());
-                        ps.setLong(20, dongEntity.getId());
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return items.size();
-                    }
-                });
-
+            @Override
+            public int getBatchSize() {
+                return items.size();
+            }
+        });
     }
 }
