@@ -1,5 +1,7 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
+import com.example.comprehensivedegisn.batch.api_client.ApiClient;
+import com.example.comprehensivedegisn.batch.api_client.OpenApiRequest;
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +16,8 @@ import java.time.LocalDate;
 @Slf4j
 public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailResponse> {
 
-    private final OpenApiClient openApiClient;
+    private static final String NEXT_PAGE_NO = "nextPageNo";
+    private static final String NEXT_CONTRACT_DATE = "nextContractDate";
 
     private int pageNo = 1;
     private LocalDate contractDate = LocalDate.now().minusMonths(1);
@@ -22,52 +25,57 @@ public class OpenApiBatchReader implements ItemStreamReader<ApartmentDetailRespo
     @Value("#{jobParameters[regionalCode]}")
     private String regionalCode;
 
+    private final ApiClient<OpenApiRequest, ApartmentDetailResponse> openApiClient;
+    private final int NUM_OF_ROWS;
+
     @Override
     public ApartmentDetailResponse read()  {
-        ApartmentDetailResponse response = openApiClient.request(pageNo, contractDate, regionalCode);
 
-        log.info("pageNo: {}, contractDate: {}", pageNo, contractDate);
-
+        ApartmentDetailResponse response = openApiClient.callApi(new OpenApiRequest(regionalCode, pageNo, contractDate));
         if(response.isLimitExceeded()){
             log.error("Limit Exceeded");
             throw new RuntimeException("Limit Exceeded");
         }
 
+        log.info("pageNo : {}, contractDate : {}, totalCount : {}", pageNo, contractDate, response.getTotalCount());
+
         if(response.isEndOfData()) return null;
 
-        if(response.isEndOfPage()){
-            contractDate = getPreMonthContractDate();
-            pageNo = 1;
-            return response;
+        if(isEndOfPage(response.getTotalCount())) {
+                contractDate = getPreMonthContractDate();
+                pageNo = 1;
         }
-        else{
+        else {
             pageNo++;
-            return response;
         }
+            return response;
     }
 
     private LocalDate getPreMonthContractDate() {
         return contractDate.minusMonths(1);
     }
 
+    private boolean isEndOfPage(int totalCount) {
+        return pageNo * NUM_OF_ROWS >= totalCount;
+    }
+
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        if (executionContext.containsKey("lastPageNo")) {
-            pageNo = executionContext.getInt("lastPageNo") + 1;
-        } else {
-            executionContext.putInt("lastPageNo", pageNo);
+
+        if (executionContext.containsKey(NEXT_PAGE_NO)) {
+            pageNo = executionContext.getInt(NEXT_PAGE_NO);
         }
 
-        if (executionContext.containsKey("lastContractDate")) {
-            contractDate = LocalDate.parse(executionContext.getString("lastContractDate"));
-        } else {
-            executionContext.putString("lastContractDate", contractDate.toString());
+        if (executionContext.containsKey(NEXT_CONTRACT_DATE)) {
+            contractDate = LocalDate.parse(executionContext.getString(NEXT_CONTRACT_DATE));
         }
     }
+
 
     @Override
     public void update(ExecutionContext executionContext) throws ItemStreamException {
-        executionContext.putInt("lastPageNo", pageNo);
-        executionContext.putString("lastContractDate", contractDate.toString());
+        executionContext.putInt(NEXT_PAGE_NO, pageNo);
+        executionContext.putString(NEXT_CONTRACT_DATE, contractDate.toString());
     }
+
 }
