@@ -1,30 +1,29 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
 
-import com.example.comprehensivedegisn.domain.DongEntity;
-import com.example.comprehensivedegisn.domain.repository.DongRepository;
+import com.example.comprehensivedegisn.domain.Gu;
+import com.example.comprehensivedegisn.domain.repository.QuerydslDongRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class OpenApiDongDataHolder {
 
-    private final DongRepository dongRepository;
-    private Map<String, Map<String, DongEntity>> dongMap;
+    private final QuerydslDongRepository QuerydslDongRepository;
+    private Map<String, Integer> dongMap;
 
+    @Value("#{jobParameters[regionalCode]}")
+    private String regionalCode;
 
     @PostConstruct
     public void init(){
-        dongMap = dongRepository.findAll().stream()
-                .collect(Collectors.groupingBy(dongEntity -> dongEntity.getGu().getRegionalCode(),
-                        Collectors.toMap(DongEntity::getDongCode, dongEntity -> dongEntity)));
+        dongMap = QuerydslDongRepository.findByGuToMap(Gu.getGuFromRegionalCode(regionalCode));
     }
 
-    public DongEntity getDongEntity(String regionalCode, String dongCode){
-        return dongMap.get(regionalCode).get(dongCode);
+    public Integer getDongEntityId(String dongCode){
+        return dongMap.get(dongCode);
     }
-
 }
