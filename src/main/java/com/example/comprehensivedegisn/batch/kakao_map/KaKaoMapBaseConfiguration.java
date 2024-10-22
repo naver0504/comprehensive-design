@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -67,20 +66,20 @@ public class KaKaoMapBaseConfiguration {
                     log.error("Error while getting future", e);
                     throw new IllegalStateException(e);
                 }
-            }).toList();
+            }).filter(ApartmentGeoRecord::isNotEmpty).toList();
 
 
             Connection connection = dataSource.getConnection();
+
             PreparedStatement statement = connection.prepareStatement("""
-                    update apartment_transaction set x = ?, y = ? where id = ?
+                    update apartment_transaction set geography = ST_GeomFromText(?) where id = ?
                     """.trim());
 
             try {
                 log.info("start idx : {}", apartmentGeoRecords.get(0).id());
                 for (ApartmentGeoRecord apartmentGeoRecord : apartmentGeoRecords) {
-                    statement.setString(1, apartmentGeoRecord.x());
-                    statement.setString(2, apartmentGeoRecord.y());
-                    statement.setLong(3, apartmentGeoRecord.id());
+                    statement.setString(1, apartmentGeoRecord.toPoint());
+                    statement.setLong(2, apartmentGeoRecord.id());
                     statement.addBatch();
                 }
                 statement.executeBatch();
