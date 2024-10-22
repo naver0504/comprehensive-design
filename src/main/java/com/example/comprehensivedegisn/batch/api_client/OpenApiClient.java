@@ -14,10 +14,9 @@ import java.net.URI;
 @Slf4j
 public class OpenApiClient implements ApiClient<OpenApiRequest, ApartmentDetailResponse> {
 
-    private static final int NUM_OF_ROWS = 1000;
     private final OpenAPiProperties openAPiProperties;
     private final RestTemplate restTemplate;
-
+    private final int NUM_OF_ROWS;
 
     @Override
     public String createUrl(OpenApiRequest openApiRequest) {
