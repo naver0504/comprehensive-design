@@ -1,6 +1,7 @@
 package com.example.comprehensivedegisn.domain;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Table(name = "apartment_transaction")
@@ -20,21 +21,17 @@ public class ApartmentTransaction {
     private int roadNameBonbun;
     private int roadNameBubun;
     private int roadNameCode;
-    private String dong;
     private int bonbun;
     private int bubun;
-    private int landCode;
     private String apartmentName;
     private int dealMonth;
     private int dealDay;
     private double areaForExclusiveUse;
     private String jibun;
     private int floor;
-    private String registrationDate;
-    private String rdealerLawDnm;
 
-    private String x;
-    private String y;
+    @Column(columnDefinition = "GEOMETRY")
+    private Point geography;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dong_entity_id")
