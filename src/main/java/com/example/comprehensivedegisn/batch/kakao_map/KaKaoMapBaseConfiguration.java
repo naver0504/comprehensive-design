@@ -39,14 +39,17 @@ public class KaKaoMapBaseConfiguration {
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
-        // size 5부터 메모리 사용량 94퍼
+        // size 6일시 메모리 사용량 95퍼 까지 상승
         threadPoolTaskExecutor.setCorePoolSize(6);
+
         //corePoolSize 만큼 thread 를 미리 생성한다.
-//        threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
+        //threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
 
         //corePoolSize 만큼 thread 를 미리 생성하지 않는걸로 수정
         //싱글톤 빈으로 등록되어 있기 때문에 미리 생성하지 않는다.
         threadPoolTaskExecutor.setPrestartAllCoreThreads(false);
+        //true 설정시 어플리케이션 종료 요청시 queue에 남아 있는 모든 작업들이 완료될 때까지 기다린 후 종료된다.
+        threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         threadPoolTaskExecutor.setThreadNamePrefix("kakaoMapTaskExecutor-");
         return threadPoolTaskExecutor;
     }
@@ -69,14 +72,14 @@ public class KaKaoMapBaseConfiguration {
             }).filter(ApartmentGeoRecord::isNotEmpty).toList();
 
 
-            Connection connection = dataSource.getConnection();
+            log.info("start idx : {}", apartmentGeoRecords.get(0).id());
 
+            Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement("""
                     update apartment_transaction set geography = ST_GeomFromText(?) where id = ?
                     """.trim());
 
-            try {
-                log.info("start idx : {}", apartmentGeoRecords.get(0).id());
+            try(connection; statement) {
                 for (ApartmentGeoRecord apartmentGeoRecord : apartmentGeoRecords) {
                     statement.setString(1, apartmentGeoRecord.toPoint());
                     statement.setLong(2, apartmentGeoRecord.id());
@@ -86,13 +89,6 @@ public class KaKaoMapBaseConfiguration {
             } catch (Exception exception) {
                 log.error("Error while writing to db", exception);
                 throw exception;
-            } finally {
-                if (!statement.isClosed()) {
-                    statement.close();
-                }
-                if (!connection.isClosed()) {
-                    connection.close();
-                }
             }
         };
     }
