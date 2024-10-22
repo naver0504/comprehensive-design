@@ -93,14 +93,13 @@ public class KaKaoMapBatchConfigurationWithJibun {
                         TransactionWithGu.class,
                         apartmentTransaction.id,
                         dongEntity.gu,
-                        apartmentTransaction.aptDong,
+                        apartmentTransaction.dongEntity.dongName,
                         apartmentTransaction.jibun)
                 )
                 .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.eq(dongEntity))
                 .where(
-                        apartmentTransaction.x.isNull(),
-                        apartmentTransaction.y.isNull()
+                        apartmentTransaction.geography.isNull()
                 ));
     }
 
