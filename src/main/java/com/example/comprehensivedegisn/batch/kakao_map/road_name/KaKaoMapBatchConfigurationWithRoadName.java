@@ -81,11 +81,11 @@ public class KaKaoMapBatchConfigurationWithRoadName {
 
     @Bean(name = STEP_NAME + " Reader")
     @StepScope
-    public JpaPagingItemReader<ApartmentTransaction> jpaApartmentTransactionReader(@Value("#{jobParameters[regionalCode]}") String guCode) {
+    public JpaPagingItemReader<ApartmentTransaction> jpaApartmentTransactionReader(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
         JpaPagingItemReader<ApartmentTransaction> reader = new JpaPagingItemReader<>();
         reader.setEntityManagerFactory(emf);
-        reader.setQueryString("SELECT a FROM ApartmentTransaction a join DongEntity d on a.dongEntity.id = d.id where d.guCode = :guCode order by a.id asc");
-        reader.setParameterValues(Map.of("guCode", guCode));
+        reader.setQueryString("SELECT a FROM ApartmentTransaction a join DongEntity d on a.dongEntity.id = d.id where d.guCode = :regionalCode order by a.id asc");
+        reader.setParameterValues(Map.of("regionalCode", regionalCode));
         reader.setPageSize(CHUNK_SIZE);
         return reader;
     }
