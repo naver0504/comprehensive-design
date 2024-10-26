@@ -1,10 +1,11 @@
 package com.example.comprehensivedegisn.batch.excel_write;
 
+import com.example.comprehensivedegisn.batch.excel_write.dto.ExcelTransactionRecord;
 import com.example.comprehensivedegisn.batch.query_dsl.QuerydslNoOffsetIdPagingItemReader;
 import com.example.comprehensivedegisn.batch.query_dsl.expression.Expression;
 import com.example.comprehensivedegisn.batch.query_dsl.options.QuerydslNoOffsetNumberOptions;
-import com.example.comprehensivedegisn.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.domain.Gu;
+import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -36,6 +37,7 @@ public class ExcelWriterBatchConfiguration {
     private static final String JOB_NAME = "excelWriterJob";
     private static final String STEP_NAME = JOB_NAME + "_step";
     private static final int chunkSize = 1000;
+    private static final String DELIMITER = "|";
 
     private final EntityManagerFactory emf;
     private final JobRepository jobRepository;
@@ -43,30 +45,50 @@ public class ExcelWriterBatchConfiguration {
 
     @Bean
     @StepScope
-    public QuerydslNoOffsetIdPagingItemReader<ApartmentTransaction, Long> apartmentTransactionReader(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
+    public QuerydslNoOffsetIdPagingItemReader<ExcelTransactionRecord, Long> apartmentTransactionReader(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
 
-        QuerydslNoOffsetNumberOptions<ApartmentTransaction, Long> options =
+        QuerydslNoOffsetNumberOptions<ExcelTransactionRecord, Long> options =
                 new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
         return new QuerydslNoOffsetIdPagingItemReader<>(emf, chunkSize, options, query -> query
-                .selectFrom(apartmentTransaction)
+                .select(Projections.constructor(ExcelTransactionRecord.class,
+                        apartmentTransaction.dealAmount,
+                        apartmentTransaction.buildYear,
+                        apartmentTransaction.dealYear,
+                        apartmentTransaction.dealMonth,
+                        apartmentTransaction.dealDay,
+                        apartmentTransaction.roadName,
+                        apartmentTransaction.roadNameBonbun,
+                        apartmentTransaction.roadNameBubun,
+                        apartmentTransaction.apartmentName,
+                        apartmentTransaction.areaForExclusiveUse,
+                        apartmentTransaction.jibun,
+                        apartmentTransaction.floor,
+                        apartmentTransaction.geography,
+                        dongEntity.gu,
+                        dongEntity.dongName
+                        ))
+                .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.eq(dongEntity))
                 .where(dongEntity.guCode.eq(regionalCode)));
     }
 
     @Bean
     @StepScope
-    public FlatFileItemWriter<ApartmentTransaction> apartmentTransactionExcelWriter(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
-        Field[] fields = ApartmentTransaction.class.getDeclaredFields();
+    public FlatFileItemWriter<ExcelTransactionRecord> apartmentTransactionExcelWriter(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
+        Field[] fields = ExcelTransactionRecord.class.getDeclaredFields();
         List<String> fieldList = Arrays.stream(fields).map(Field::getName).toList();
-        String[] fieldNames = fieldList.subList(1, fieldList.size() - 1).toArray(new String[0]);
-        return new FlatFileItemWriterBuilder<ApartmentTransaction>()
+        String[] fieldNames = fieldList.toArray(new String[0]);
+        FlatFileItemWriter<ExcelTransactionRecord> flatFileItemWriter = new FlatFileItemWriterBuilder<ExcelTransactionRecord>()
                 .name("apartmentTransactionWriter")
                 .resource(new FileSystemResource("C:\\Users\\qortm\\intelliJ\\comprehensive-degisn\\src\\main\\resources\\static" + "/apartment_transaction_" + Gu.getGuFromRegionalCode(regionalCode) + ".txt"))
                 .delimited()
-                .delimiter("|")
+                .delimiter(DELIMITER)
                 .names(fieldNames)
                 .shouldDeleteIfExists(true)
                 .build();
+
+        flatFileItemWriter.setHeaderCallback(writer -> writer.write(String.join(DELIMITER, fieldNames)));
+        return flatFileItemWriter;
     }
 
     @Bean
@@ -80,7 +102,7 @@ public class ExcelWriterBatchConfiguration {
     @Bean
     public Step excelWriterStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<ApartmentTransaction, ApartmentTransaction>chunk(chunkSize, platformTransactionManager)
+                .<ExcelTransactionRecord, ExcelTransactionRecord>chunk(chunkSize, platformTransactionManager)
                 .reader(apartmentTransactionReader(null))
                 .writer(apartmentTransactionExcelWriter(null))
                 .build();
