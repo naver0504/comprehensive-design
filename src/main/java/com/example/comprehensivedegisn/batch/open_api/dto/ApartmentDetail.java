@@ -37,9 +37,11 @@ public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") St
 
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final String FORMAT = "%d-%02d-%02d";
+
 
     private String createDealDate() {
-        return dealYear + "-" + dealMonth + "-" + dealDay;
+        return String.format(FORMAT, dealYear, dealMonth, dealDay);
     }
 
     public LocalDate getDealDate() {
