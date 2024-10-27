@@ -8,10 +8,6 @@ public record ApartmentGeoRecord (Long id, String x, String y) {
     }
 
     public String toPoint() {
-        if(x == null || y == null) {
-            return String.format("POINT(%s %s)", "0", "0");
-        } else {
-            return String.format("POINT(%s %s)", x, y);
-        }
+        return String.format("POINT(%s %s)", x, y);
     }
 }
