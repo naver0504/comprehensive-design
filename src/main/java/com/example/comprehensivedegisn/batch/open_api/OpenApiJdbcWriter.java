@@ -17,7 +17,6 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
 
     private final OpenApiDongDataHolder openApiDongDataHolder;
     private final JdbcTemplate jdbcTemplate;
-
     private final String INSERT_SQL =
             "INSERT INTO apartment_transaction (" +
                     "deal_amount, " +
@@ -36,10 +35,11 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                     "jibun, " +
                     "floor, " +
                     "dong_entity_id" +
+                    "deal_date" +
                     ") " +
                     "VALUES " +
                     "( " +
-                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? " +
+                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? " +
                     ")";
 
 
@@ -71,6 +71,7 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                 ps.setString(14, apartmentDetail.jibun().trim());
                 ps.setInt(15, apartmentDetail.floor());
                 ps.setLong(16, openApiDongDataHolder.getDongEntityId(apartmentDetail.eupmyeondongCode().trim()));
+                ps.setDate(17, java.sql.Date.valueOf(apartmentDetail.getDealDate()));
             }
 
             @Override
