@@ -1,10 +1,10 @@
 package com.example.comprehensivedegisn.batch.excel_write;
 
-import com.example.comprehensivedegisn.batch.excel_write.dto.ExcelTransactionRecord;
+import com.example.comprehensivedegisn.batch.excel_write.dto.ExcelOutputRecord;
+import com.example.comprehensivedegisn.batch.excel_write.dto.ExcelQueryRecord;
 import com.example.comprehensivedegisn.batch.query_dsl.QuerydslNoOffsetIdPagingItemReader;
 import com.example.comprehensivedegisn.batch.query_dsl.expression.Expression;
 import com.example.comprehensivedegisn.batch.query_dsl.options.QuerydslNoOffsetNumberOptions;
-import com.example.comprehensivedegisn.domain.Gu;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.example.comprehensivedegisn.domain.QApartmentTransaction.*;
 import static com.example.comprehensivedegisn.domain.QDongEntity.*;
+import static com.example.comprehensivedegisn.domain.QInterest.*;
 
 @Configuration
 @RequiredArgsConstructor
@@ -45,42 +46,38 @@ public class ExcelWriterBatchConfiguration {
 
     @Bean
     @StepScope
-    public QuerydslNoOffsetIdPagingItemReader<ExcelTransactionRecord, Long> apartmentTransactionReader(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
+    public QuerydslNoOffsetIdPagingItemReader<ExcelQueryRecord, Long> apartmentTransactionReader() {
 
-        QuerydslNoOffsetNumberOptions<ExcelTransactionRecord, Long> options =
+        QuerydslNoOffsetNumberOptions<ExcelQueryRecord, Long> options =
                 new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
         return new QuerydslNoOffsetIdPagingItemReader<>(emf, chunkSize, options, query -> query
-                .select(Projections.constructor(ExcelTransactionRecord.class,
-                        apartmentTransaction.dealAmount,
-                        apartmentTransaction.buildYear,
-                        apartmentTransaction.dealYear,
-                        apartmentTransaction.dealMonth,
-                        apartmentTransaction.dealDay,
-                        apartmentTransaction.roadName,
-                        apartmentTransaction.roadNameBonbun,
-                        apartmentTransaction.roadNameBubun,
-                        apartmentTransaction.apartmentName,
-                        apartmentTransaction.areaForExclusiveUse,
-                        apartmentTransaction.jibun,
-                        apartmentTransaction.floor,
-                        apartmentTransaction.geography,
-                        dongEntity.gu,
-                        dongEntity.dongName
+                .select(Projections.constructor(ExcelQueryRecord.class,
+                        apartmentTransaction.id,
+                        apartmentTransaction,
+                        dongEntity,
+                        interest
                         ))
                 .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.eq(dongEntity))
-                .where(dongEntity.guCode.eq(regionalCode)));
+                .innerJoin(interest).on(apartmentTransaction.interest.eq(interest))
+                );
     }
 
     @Bean
     @StepScope
-    public FlatFileItemWriter<ExcelTransactionRecord> apartmentTransactionExcelWriter(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
-        Field[] fields = ExcelTransactionRecord.class.getDeclaredFields();
+    public ItemProcessor<ExcelQueryRecord, ExcelOutputRecord> excelProcessor() {
+        return ExcelQueryRecord::toExcelOutputRecord;
+    }
+
+    @Bean
+    @StepScope
+    public FlatFileItemWriter<ExcelOutputRecord> apartmentTransactionExcelWriter() {
+        Field[] fields = ExcelOutputRecord.class.getDeclaredFields();
         List<String> fieldList = Arrays.stream(fields).map(Field::getName).toList();
         String[] fieldNames = fieldList.toArray(new String[0]);
-        FlatFileItemWriter<ExcelTransactionRecord> flatFileItemWriter = new FlatFileItemWriterBuilder<ExcelTransactionRecord>()
-                .name("apartmentTransactionWriter")
-                .resource(new FileSystemResource("C:\\Users\\qortm\\intelliJ\\comprehensive-degisn\\src\\main\\resources\\static" + "/apartment_transaction_" + Gu.getGuFromRegionalCode(regionalCode) + ".txt"))
+        FlatFileItemWriter<ExcelOutputRecord> flatFileItemWriter = new FlatFileItemWriterBuilder<ExcelOutputRecord>()
+                .name("apartmentTransactionTsvWriter")
+                .resource(new FileSystemResource("output/apartment_transaction.txt"))
                 .delimited()
                 .delimiter(DELIMITER)
                 .names(fieldNames)
@@ -102,9 +99,10 @@ public class ExcelWriterBatchConfiguration {
     @Bean
     public Step excelWriterStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<ExcelTransactionRecord, ExcelTransactionRecord>chunk(chunkSize, platformTransactionManager)
-                .reader(apartmentTransactionReader(null))
-                .writer(apartmentTransactionExcelWriter(null))
+                .<ExcelQueryRecord, ExcelOutputRecord>chunk(chunkSize, platformTransactionManager)
+                .reader(apartmentTransactionReader())
+                .processor(excelProcessor())
+                .writer(apartmentTransactionExcelWriter())
                 .build();
     }
 }
