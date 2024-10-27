@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 @Slf4j
 public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransaction, ApartmentGeoRecord> {
 
@@ -31,19 +33,21 @@ public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransact
     @Override
     public ApartmentGeoRecord callApi(ApartmentTransaction apartmentTransaction) {
 
-        LocationRecord roadNameLocationRecord = roadNameCacheRepository.computeIfAbsent(
-                apartmentTransaction.getRoadNameAddress(),
-                roadNm -> {
-                    if(roadNm == null) return LocationRecord.EMPTY;
-                    Documents documents = restTemplate
-                            .exchange(
-                                    createUrl(apartmentTransaction),
-                                    HttpMethod.GET,
-                                    createHttpEntity(),
-                                    Documents.class)
-                            .getBody();
-                    return documents.toLocationRecord();
-                });
+        Optional<String> roadNameAddress = apartmentTransaction.getRoadNameAddress();
+        LocationRecord roadNameLocationRecord = roadNameAddress.isPresent() ?
+                roadNameCacheRepository.computeIfAbsent(
+                        roadNameAddress.get(),
+                        roadNm -> {
+                            Documents documents = restTemplate
+                                    .exchange(
+                                            createUrl(apartmentTransaction),
+                                            HttpMethod.GET,
+                                            createHttpEntity(),
+                                            Documents.class)
+                                    .getBody();
+                            return documents.toLocationRecord();
+                        }) : LocationRecord.EMPTY;
+
         return roadNameLocationRecord.toApartmentGeoRecord(apartmentTransaction.getId());
     }
 

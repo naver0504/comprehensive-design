@@ -9,6 +9,8 @@ import com.example.comprehensivedegisn.batch.kakao_map.dto.TransactionWithGu;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 public class KaKaoApiClientWithJibun extends KaKaoApiClient<TransactionWithGu, ApartmentGeoRecord> {
 
     private final RestTemplate restTemplate;
@@ -24,23 +26,25 @@ public class KaKaoApiClientWithJibun extends KaKaoApiClient<TransactionWithGu, A
 
     @Override
     public ApartmentGeoRecord callApi(TransactionWithGu transactionWithGu) {
-        LocationRecord jibunLocationRecord = jibunCacheRepository.computeIfAbsent(
-                transactionWithGu.getJibunAddress(),
-                jibun -> {
-                    if(jibun == null) return LocationRecord.EMPTY;
-                    Documents documents = restTemplate
-                            .exchange(
-                                    createUrl(transactionWithGu),
-                                    HttpMethod.GET,
-                                    createHttpEntity(),
-                                    Documents.class)
-                            .getBody();
-            return documents.toLocationRecord();
-        });
+
+        Optional<String> jibunAddress = transactionWithGu.getJibunAddress();
+        LocationRecord jibunLocationRecord = jibunAddress.isPresent() ?
+                jibunCacheRepository.computeIfAbsent(
+                        jibunAddress.get(),
+                        jibun -> {
+                            Documents documents = restTemplate
+                                    .exchange(
+                                            createUrl(transactionWithGu),
+                                            HttpMethod.GET,
+                                            createHttpEntity(),
+                                            Documents.class)
+                                    .getBody();
+                            return documents.toLocationRecord();
+                        }) : LocationRecord.EMPTY;
         return jibunLocationRecord.toApartmentGeoRecord(transactionWithGu.id());    }
 
     @Override
     protected String getLocation(TransactionWithGu transactionWithGu) {
-        return transactionWithGu.getJibunAddress();
+        return transactionWithGu.getResolvedJibunAddress();
     }
 }
