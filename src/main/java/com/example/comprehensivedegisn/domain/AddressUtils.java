@@ -1,10 +1,16 @@
 package com.example.comprehensivedegisn.domain;
 
+import java.util.Optional;
+
 public final class AddressUtils {
     private static final String SEOUL = "서울특별시";
 
-    public static String getJibunAddress(Gu gu, String dong, String jibun) {
-        if(jibun == null) return null;
+    public static Optional<String> getJibunAddress(Gu gu, String dong, String jibun) {
+        if(jibun == null) return Optional.empty();
+        return Optional.of(concatJibunAddress(gu, dong, jibun));
+    }
+
+    private static String concatJibunAddress(Gu gu, String dong, String jibun) {
         return gu + " " + dong + " " + jibun;
     }
 
@@ -18,9 +24,9 @@ public final class AddressUtils {
         return  gu + " " + concatRoadName(roadName, roadNameBonbun, roadNameBubun);
     }
 
-    public static String getRoadName(String roadName, int roadNameBonbun, int roadNameBubun) {
-        if(roadName == null) return null;
-        return concatRoadName(roadName, roadNameBonbun, roadNameBubun);
+    public static Optional<String> getRoadName(String roadName, int roadNameBonbun, int roadNameBubun) {
+        if(roadName == null) return Optional.empty();
+        return Optional.of(concatRoadName(roadName, roadNameBonbun, roadNameBubun));
     }
 
     private static String concatRoadName(String roadName, int roadNameBonbun, int roadNameBubun) {
