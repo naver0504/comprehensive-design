@@ -34,13 +34,11 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                     "area_for_exclusive_use, " +
                     "jibun, " +
                     "floor, " +
-                    "dong_entity_id" +
+                    "dong_entity_id," +
                     "deal_date" +
                     ") " +
-                    "VALUES " +
-                    "( " +
-                    "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? " +
-                    ")";
+                    "VALUES" +
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
 
