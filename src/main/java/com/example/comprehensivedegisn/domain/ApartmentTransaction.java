@@ -4,6 +4,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Entity
 @Table(name = "apartment_transaction")
@@ -53,7 +54,7 @@ public class ApartmentTransaction {
         return AddressUtils.getRoadNameWithGu(gu, roadName, roadNameBonbun, roadNameBubun);
     }
 
-    public String getRoadNameAddress() {
+    public Optional<String> getRoadNameAddress() {
         return AddressUtils.getRoadName(roadName, roadNameBonbun, roadNameBubun);
     }
 
