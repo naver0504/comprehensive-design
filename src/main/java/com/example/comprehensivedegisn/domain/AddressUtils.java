@@ -4,6 +4,7 @@ public final class AddressUtils {
     private static final String SEOUL = "서울특별시";
 
     public static String getJibunAddress(Gu gu, String dong, String jibun) {
+        if(jibun == null) return null;
         return gu + " " + dong + " " + jibun;
     }
 
