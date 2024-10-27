@@ -32,8 +32,9 @@ public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransact
     public ApartmentGeoRecord callApi(ApartmentTransaction apartmentTransaction) {
 
         LocationRecord roadNameLocationRecord = roadNameCacheRepository.computeIfAbsent(
-                apartmentTransaction.getRoadName(),
+                apartmentTransaction.getRoadNameAddress(),
                 roadNm -> {
+                    if(roadNm == null) return LocationRecord.EMPTY;
                     Documents documents = restTemplate
                             .exchange(
                                     createUrl(apartmentTransaction),

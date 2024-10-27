@@ -24,10 +24,10 @@ public class KaKaoApiClientWithJibun extends KaKaoApiClient<TransactionWithGu, A
 
     @Override
     public ApartmentGeoRecord callApi(TransactionWithGu transactionWithGu) {
-
         LocationRecord jibunLocationRecord = jibunCacheRepository.computeIfAbsent(
                 transactionWithGu.getJibunAddress(),
                 jibun -> {
+                    if(jibun == null) return LocationRecord.EMPTY;
                     Documents documents = restTemplate
                             .exchange(
                                     createUrl(transactionWithGu),
