@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 
 @JacksonXmlRootElement(localName = "item")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") String dealAmount,
-                                @JacksonXmlProperty(localName = "거래유형") String dealType,
+                              @JacksonXmlProperty(localName = "거래유형") String dealType,
                               @JacksonXmlProperty(localName = "건축년도") int buildYear,
                               @JacksonXmlProperty(localName = "년") int dealYear,
                               @JacksonXmlProperty(localName = "도로명") String roadName,
@@ -31,5 +34,16 @@ public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") St
                               @JacksonXmlProperty(localName = "층") int floor,
                               @JacksonXmlProperty(localName = "중개사소재지") String rdealerLawDnm,
                               @JacksonXmlProperty(localName = "등기일자") String registrationDate) {
+
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    private String createDealDate() {
+        return dealYear + "-" + dealMonth + "-" + dealDay;
+    }
+
+    public LocalDate getDealDate() {
+        return LocalDate.parse(createDealDate(), DATE_FORMATTER);
+    }
 
 }
