@@ -3,6 +3,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "apartment_transaction")
 @Builder
@@ -29,6 +31,7 @@ public class ApartmentTransaction {
     private double areaForExclusiveUse;
     private String jibun;
     private int floor;
+    private LocalDate dealDate;
 
     @Column(columnDefinition = "GEOMETRY")
     private Point geography;
@@ -37,20 +40,21 @@ public class ApartmentTransaction {
     @JoinColumn(name = "dong_entity_id")
     private DongEntity dongEntity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interest_id")
+    private Interest interest;
+
     @Override
     public String toString() {
         return String.valueOf(this.id);
     }
 
     public String getRoadNameWithGu(Gu gu) {
-        return gu + " " + getRoadName();
+        return AddressUtils.getRoadNameWithGu(gu, roadName, roadNameBonbun, roadNameBubun);
     }
 
-    public String getRoadName() {
-        return roadName + " " + roadNameBonbun + getRoadNameBubun();
+    public String getRoadNameAddress() {
+        return AddressUtils.getRoadName(roadName, roadNameBonbun, roadNameBubun);
     }
 
-    private String getRoadNameBubun() {
-        return this.roadNameBubun == 0 ? "" : "-" + this.roadNameBubun;
-    }
 }
