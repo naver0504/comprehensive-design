@@ -21,11 +21,12 @@ public final class AddressUtils {
 
     public static String getRoadNameWithGu(Gu gu, String roadName, int roadNameBonbun, int roadNameBubun) {
         if(roadName == null) return null;
+
         return  gu + " " + concatRoadName(roadName, roadNameBonbun, roadNameBubun);
     }
 
     public static Optional<String> getRoadName(String roadName, int roadNameBonbun, int roadNameBubun) {
-        if(roadName == null) return Optional.empty();
+        if(roadName == null || roadNameBonbun == 0) return Optional.empty();
         return Optional.of(concatRoadName(roadName, roadNameBonbun, roadNameBubun));
     }
 
