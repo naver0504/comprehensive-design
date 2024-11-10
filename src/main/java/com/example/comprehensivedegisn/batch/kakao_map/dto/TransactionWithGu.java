@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.kakao_map.dto;
 
-import com.example.comprehensivedegisn.domain.AddressUtils;
-import com.example.comprehensivedegisn.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.AddressUtils;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
 
 import java.util.Optional;
 

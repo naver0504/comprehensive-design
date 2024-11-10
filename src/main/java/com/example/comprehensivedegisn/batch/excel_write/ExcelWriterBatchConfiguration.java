@@ -27,9 +27,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.comprehensivedegisn.domain.QApartmentTransaction.*;
-import static com.example.comprehensivedegisn.domain.QDongEntity.*;
-import static com.example.comprehensivedegisn.domain.QInterest.*;
+import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
+import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
+import static com.example.comprehensivedegisn.adapter.domain.QInterest.interest;
+
 
 @Configuration
 @RequiredArgsConstructor

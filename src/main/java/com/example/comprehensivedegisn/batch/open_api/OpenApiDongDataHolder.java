@@ -1,8 +1,8 @@
 package com.example.comprehensivedegisn.batch.open_api;
 
 
-import com.example.comprehensivedegisn.domain.Gu;
-import com.example.comprehensivedegisn.domain.repository.QuerydslDongRepository;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.adapter.repository.dong.QuerydslDongRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

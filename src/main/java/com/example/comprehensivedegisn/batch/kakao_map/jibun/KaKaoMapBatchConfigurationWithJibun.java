@@ -34,8 +34,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Future;
 
-import static com.example.comprehensivedegisn.domain.QApartmentTransaction.apartmentTransaction;
-import static com.example.comprehensivedegisn.domain.QDongEntity.dongEntity;
+import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
+import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
+
 
 @Configuration
 @EnableConfigurationProperties(KaKaoRestApiProperties.class)

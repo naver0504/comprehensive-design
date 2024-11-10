@@ -2,7 +2,7 @@ package com.example.comprehensivedegisn.batch.open_api;
 
 import com.example.comprehensivedegisn.batch.api_client.OpenApiClient;
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
-import com.example.comprehensivedegisn.domain.repository.QuerydslDongRepository;
+import com.example.comprehensivedegisn.adapter.repository.dong.QuerydslDongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;

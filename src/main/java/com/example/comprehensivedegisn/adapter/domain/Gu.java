@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.domain;
+package com.example.comprehensivedegisn.adapter.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,10 @@ public enum Gu {
     마포구("11440"), 서대문구("11410"), 서초구("11650"), 성동구("11200"),
     성북구("11290"), 송파구("11710"), 양천구("11470"), 영등포구("11560"),
     용산구("11170"), 은평구("11380"), 종로구("11110"), 중구("11140"),
-    중랑구("11260");
+    중랑구("11260"), NONE("none");
 
     private final String regionalCode;
-
-    private static List<Gu> guList = List.of(Gu.values());
+    public static final List<Gu> guList = List.of(Gu.values()).subList(0, Gu.values().length - 1);
 
     public static Gu getGuFromRegionalCode(String regionalCode) {
         return guList.stream()

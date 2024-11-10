@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.controller;
 
 
-import com.example.comprehensivedegisn.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;

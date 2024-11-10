@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.domain;
+package com.example.comprehensivedegisn.adapter.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
@@ -44,11 +44,6 @@ public class ApartmentTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interest_id")
     private Interest interest;
-
-    @Override
-    public String toString() {
-        return String.valueOf(this.id);
-    }
 
     public String getRoadNameWithGu(Gu gu) {
         return AddressUtils.getRoadNameWithGu(gu, roadName, roadNameBonbun, roadNameBubun);

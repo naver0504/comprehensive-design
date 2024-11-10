@@ -7,7 +7,7 @@ import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.api_client.ApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
-import com.example.comprehensivedegisn.domain.ApartmentTransaction;
+import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.domain;
+package com.example.comprehensivedegisn.adapter.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

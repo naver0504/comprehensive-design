@@ -1,6 +1,6 @@
 package com.example.comprehensivedegisn.batch.excel_write.dto;
 
-import com.example.comprehensivedegisn.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
 
 import java.time.LocalDate;
 
