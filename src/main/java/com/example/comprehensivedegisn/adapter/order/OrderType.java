@@ -1,10 +1,11 @@
-package com.example.comprehensivedegisn.repository.order;
+package com.example.comprehensivedegisn.adapter.order;
 
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import static com.example.comprehensivedegisn.domain.QApartmentTransaction.*;
+import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
+
 
 @Getter
 @RequiredArgsConstructor
