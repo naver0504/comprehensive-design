@@ -1,6 +1,6 @@
-package com.example.comprehensivedegisn.domain.repository;
+package com.example.comprehensivedegisn.adapter.repository.dong;
 
-import com.example.comprehensivedegisn.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 
-import static com.example.comprehensivedegisn.domain.QDongEntity.dongEntity;
+import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
+
 
 @Repository
 @RequiredArgsConstructor
