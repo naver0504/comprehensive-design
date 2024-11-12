@@ -5,18 +5,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("prod")
 class OpenApiClientTest {
-
-    @Autowired
-    private OpenApiClient openApiClient;
-    @Test
-    void localDateTimeTest() throws Exception {
-
-        LocalDate localDate = LocalDate.now().minusMonths(3);
-        openApiClient.request(1, localDate);
-    }
 
     @Test
     void xmlMapperTest() throws JsonProcessingException {
@@ -137,7 +130,6 @@ class OpenApiClientTest {
                         "</response>";
 
         XmlMapper xmlMapper = new XmlMapper();
-        ApartmentDetailRootElement apartmentDetailRootElement = xmlMapper.readValue(xml, ApartmentDetailRootElement.class);
-        System.out.println(apartmentDetailRootElement);
+        ApartmentDetailResponse apartmentDetailRootElement = xmlMapper.readValue(xml, ApartmentDetailResponse.class);
     }
 }
