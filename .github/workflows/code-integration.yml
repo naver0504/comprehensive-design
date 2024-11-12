@@ -27,7 +27,7 @@ jobs:
         env:
           PROPERTY_FILE: ${{ secrets.TEST_YML }}
           PROPERTY_FILE_NAME: application.yml
-        run: echo $PROPERTY_FILE > $PROPERTY_DIR/$PROPERTY_FILE_NAME
+        run: echo $PROPERTY_FILE | base64 --decode > $PROPERTY_DIR/$PROPERTY_FILE_NAME
 
       - name: Set up JDK
         uses: actions/setup-java@v4
