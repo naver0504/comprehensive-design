@@ -10,6 +10,7 @@ name: Java CI with Gradle
 on:
   pull_request:
     branches: [ "master" ]
+permissions: write-all
 
 env:
   PROPERTY_DIR: src/main/resources
