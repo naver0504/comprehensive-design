@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBatchTest
 @SpringBootTest
-@ActiveProfiles("prod")
+@ActiveProfiles("local")
 class KaKaoMapBatchWithJibunConfigurationTest {
 
     @Autowired
