@@ -2,18 +2,18 @@ package com.example.comprehensivedegisn.api;
 
 import com.example.comprehensivedegisn.batch.open_api.JdbcTemplateConfig;
 import com.example.comprehensivedegisn.batch.open_api.OpenApiBatchConfiguration;
-import com.example.comprehensivedegisn.batch.open_api.OpenApiClient;
-import com.example.comprehensivedegisn.domain.Gu;
-import com.example.comprehensivedegisn.domain.repository.ApartmentTransactionRepository;
-import com.example.comprehensivedegisn.domain.repository.DongRepository;
+import com.example.comprehensivedegisn.api_client.OpenApiClient;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
+import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-
-import static com.example.comprehensivedegisn.domain.Gu.노원구;
-
-@ActiveProfiles("prod")
 @SpringBootTest
 @ComponentScan(basePackageClasses = {OpenApiBatchConfiguration.class, DongRepository.class})
 @Import({OpenApiClient.class, TestBatchConfig.class, JdbcTemplateConfig.class})
 @SpringBatchTest
+@ActiveProfiles("local")
 public class BatchTest {
 
 
