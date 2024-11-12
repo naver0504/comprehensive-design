@@ -75,3 +75,6 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-parameters"
 }
 
+jar {
+    enabled = false
+}
