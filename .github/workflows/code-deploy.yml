@@ -1,0 +1,80 @@
+name: Release - Code Deploy with Github Actions
+
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PROPERTY_DIR: src/main/resources
+jobs:
+  deploy:
+    name: Build and dockerize & deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set RELEASE_VERSION
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+        
+      - name: Set application-prod.properties
+        env:
+          PROPERTY_FILE: ${{ secrets.PROD_YML }}
+          PROPERTY_FILE_NAME: application-prod.yml
+        run: echo $PROPERTY_FILE > $PROPERTY_DIR/$PROPERTY_FILE_NAME
+        
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Git Actions cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+
+      - name: Docker Hub Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+      - name: Build, tag and push image to Github Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            naver0504/comprehensive-design-backend:latest
+            naver0504/comprehensive-design-backend:${{ env.RELEASE_VERSION }}
+
+        ## deploy to production
+      - name: Deploy to prod
+        uses: appleboy/ssh-action@master
+        id: deploy-prod
+        with:
+          host: ${{ secrets.HOST_PROD }} # EC2 퍼블릭 IPv4 DNS
+          username: ubuntu
+          key: ${{ secrets.EC2_PEM_KEY }}
+          envs: GITHUB_SHA
+          script: |
+            docker stop backend && docker rm backend
+            sudo docker rmi $(docker images | grep "comprehensive-design-backend") -f
+            sudo docker pull naver0504/comprehensive-design-backend:latest
+            sudo docker run -d --name backend -p 8080:8080 --restart unless-stopped naver0504/comprehensive-design-backend/latest
