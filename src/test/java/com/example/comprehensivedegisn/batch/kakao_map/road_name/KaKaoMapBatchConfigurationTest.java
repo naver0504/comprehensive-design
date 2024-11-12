@@ -26,11 +26,6 @@ class KaKaoMapBatchConfigurationTest {
     @Autowired
     private JobRepositoryTestUtils jobRepositoryTestUtils;
 
-
-    @BeforeEach
-    public void clearMetadata() {
-        jobRepositoryTestUtils.removeJobExecutions();
-    }
     @Test
     public void readerTest() throws Exception {
 
