@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.api_client;
+package com.example.comprehensivedegisn.api_client;
 
 public interface ApiClient<T, R> {
 
