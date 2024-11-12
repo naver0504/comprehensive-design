@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.api_client;
+package com.example.comprehensivedegisn.api_client;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
