@@ -50,7 +50,7 @@ jobs:
       - name: Set application.yml
         env:
           PROPERTY_FILE: ${{ secrets.TEST_YML }}
-          ROPERTY_FILE_NAME: application.yml
+          PROPERTY_FILE_NAME: application.yml
         run: echo $PROPERTY_FILE | base64 --decode > $PROPERTY_DIR/$PROPERTY_FILE_NAME
 
       - name: Set up JDK
@@ -82,6 +82,7 @@ jobs:
           files: build/test-results/**/*.xml
 
       - name: Remove Github Actions IP from security group
+        if: ${{ always() }}
         run: |
           aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
         env:
