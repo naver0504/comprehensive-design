@@ -69,7 +69,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-test.onlyIf { project.getProperties().get("spring.profiles.active") != "local" }
 // QueryDSL
 def queryDslDir = "src/main/generated/queryDsl"
 clean {
@@ -80,6 +79,11 @@ tasks.withType(JavaCompile).configureEach {
     options.generatedSourceOutputDirectory = file(queryDslDir)
     // Enable java.lang.reflect.Parameter during compile task
     options.compilerArgs << "-parameters"
+    onlyIf {
+        def activeProfile = project.hasProperty('spring.profiles.active') ? project.getProperty('spring.profiles.active') : ""
+        def isCI = System.getenv("CI") == "true"
+        !(isCI && activeProfile == "local")
+    }
 }
 
 jar {
