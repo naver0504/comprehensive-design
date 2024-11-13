@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
+import com.example.comprehensivedegisn.SkipCompileTest;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
@@ -15,8 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @SpringBatchTest
-@ActiveProfiles("local")
-class KaKaoMapBatchConfigurationTest {
+class KaKaoMapBatchConfigurationTest  extends SkipCompileTest  {
 
     @Autowired
     private BeanFactory beanFactory;

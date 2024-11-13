@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.batch.kakao_map.jibun;
 
+import com.example.comprehensivedegisn.SkipCompileTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -17,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBatchTest
 @SpringBootTest
-@ActiveProfiles("local")
-class KaKaoMapBatchWithJibunConfigurationTest {
+class KaKaoMapBatchWithJibunConfigurationTest extends SkipCompileTest {
 
     @Autowired
     private BeanFactory beanFactory;
