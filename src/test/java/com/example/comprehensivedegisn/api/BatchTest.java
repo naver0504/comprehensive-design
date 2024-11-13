@@ -1,6 +1,5 @@
 package com.example.comprehensivedegisn.api;
 
-import com.example.comprehensivedegisn.SkipCompileTest;
 import com.example.comprehensivedegisn.batch.open_api.JdbcTemplateConfig;
 import com.example.comprehensivedegisn.batch.open_api.OpenApiBatchConfiguration;
 import com.example.comprehensivedegisn.api_client.OpenApiClient;

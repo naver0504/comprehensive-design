@@ -1,6 +1,5 @@
 package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
-import com.example.comprehensivedegisn.SkipCompileTest;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
