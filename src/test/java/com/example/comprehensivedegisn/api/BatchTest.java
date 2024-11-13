@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ComponentScan(basePackageClasses = {OpenApiBatchConfiguration.class, DongRepository.class})
 @Import({OpenApiClient.class, TestBatchConfig.class, JdbcTemplateConfig.class})
 @SpringBatchTest
-@ActiveProfiles("prod")
+@ActiveProfiles("local")
 public class BatchTest {
 
 

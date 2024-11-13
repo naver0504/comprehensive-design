@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @SpringBatchTest
-@ActiveProfiles("prod")
+@ActiveProfiles("local")
 class KaKaoMapBatchConfigurationTest {
 
     @Autowired

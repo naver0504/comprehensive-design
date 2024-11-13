@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest
-@ActiveProfiles("prod")
+@ActiveProfiles("local")
 public class KaKaoMapApiTest {
 
     @Autowired
