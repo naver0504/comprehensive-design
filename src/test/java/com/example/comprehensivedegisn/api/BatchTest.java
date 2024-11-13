@@ -27,7 +27,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ComponentScan(basePackageClasses = {OpenApiBatchConfiguration.class, DongRepository.class})
 @Import({OpenApiClient.class, TestBatchConfig.class, JdbcTemplateConfig.class})
 @SpringBatchTest
-public class BatchTest extends SkipCompileTest {
+@ActiveProfiles("local")
+public class BatchTest  {
 
 
     @Autowired

@@ -1,6 +1,5 @@
 package com.example.comprehensivedegisn.kakao_map;
 
-import com.example.comprehensivedegisn.SkipCompileTest;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
@@ -17,7 +16,8 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest
-public class KaKaoMapApiTest extends SkipCompileTest  {
+@ActiveProfiles("local")
+public class KaKaoMapApiTest {
 
     @Autowired
     KaKaoRestApiProperties kaKaoMapApi;

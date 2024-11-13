@@ -16,7 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @SpringBatchTest
-class KaKaoMapBatchConfigurationTest  extends SkipCompileTest  {
+@ActiveProfiles("local")
+class KaKaoMapBatchConfigurationTest {
 
     @Autowired
     private BeanFactory beanFactory;
