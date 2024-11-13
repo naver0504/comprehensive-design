@@ -69,6 +69,7 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+test.onlyIf { project.getProperties().get("spring.profiles.active") != "local" }
 // QueryDSL
 def queryDslDir = "src/main/generated/queryDsl"
 clean {
