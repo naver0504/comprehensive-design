@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.batch.open_api.dto;
 
+import com.example.comprehensivedegisn.adapter.domain.DealingGbn;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
@@ -10,30 +11,17 @@ import java.time.format.DateTimeFormatter;
 
 @JacksonXmlRootElement(localName = "item")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record ApartmentDetail(@JacksonXmlProperty(localName = "거래금액") String dealAmount,
-                              @JacksonXmlProperty(localName = "거래유형") String dealType,
-                              @JacksonXmlProperty(localName = "건축년도") int buildYear,
-                              @JacksonXmlProperty(localName = "년") int dealYear,
-                              @JacksonXmlProperty(localName = "도로명") String roadName,
-                              @JacksonXmlProperty(localName = "도로명건물본번호코드") int roadNameBonbun,
-                              @JacksonXmlProperty(localName = "도로명건물부번호코드") int roadNameBubun,
-                              @JacksonXmlProperty(localName = "도로명코드") int roadNameCode,
-                              @JacksonXmlProperty(localName = "법정동") String dong,
-                              @JacksonXmlProperty(localName = "법정동본번코드") int bonbun,
-                              @JacksonXmlProperty(localName = "법정동부번코드") int bubun,
-                              @JacksonXmlProperty(localName = "법정동시군구코드") String sigunguCode,
-                              @JacksonXmlProperty(localName = "법정동읍면동코드") String eupmyeondongCode,
-                              @JacksonXmlProperty(localName = "법정동지번코드") int landCode,
-                              @JacksonXmlProperty(localName = "아파트") String apartmentName,
-                              @JacksonXmlProperty(localName = "월") int dealMonth,
-                              @JacksonXmlProperty(localName = "일") int dealDay,
-                              @JacksonXmlProperty(localName = "일련번호") String serialNumber,
-                              @JacksonXmlProperty(localName = "전용면적") double areaForExclusiveUse,
-                              @JacksonXmlProperty(localName = "지번") String jibun,
-                              @JacksonXmlProperty(localName = "지역코드") int regionalCode,
-                              @JacksonXmlProperty(localName = "층") int floor,
-                              @JacksonXmlProperty(localName = "중개사소재지") String rdealerLawDnm,
-                              @JacksonXmlProperty(localName = "등기일자") String registrationDate) {
+public record ApartmentDetail(@JacksonXmlProperty String dealAmount,
+                              @JacksonXmlProperty DealingGbn dealingGbn,
+                              @JacksonXmlProperty int buildYear,
+                              @JacksonXmlProperty int dealYear,
+                              @JacksonXmlProperty int dealMonth,
+                              @JacksonXmlProperty int dealDay,
+                              @JacksonXmlProperty(localName = "umdNm") String dongName,
+                              @JacksonXmlProperty(localName = "aptNm") String apartmentName,
+                              @JacksonXmlProperty(localName = "excluUseAr") double areaForExclusiveUse,
+                              @JacksonXmlProperty String jibun,
+                              @JacksonXmlProperty int floor) {
 
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
