@@ -7,6 +7,10 @@ categories:
     label: 'bug'
   - title: '📚 Docs'
     label: 'documentation'
+  - title: '🐬 코드를 개선했어요'
+    label: 
+      - '🧼 refactor'
+      - '🎫 test'
 change-template: '- $TITLE #$NUMBER @$AUTHOR '
 template: |
   $CHANGES
