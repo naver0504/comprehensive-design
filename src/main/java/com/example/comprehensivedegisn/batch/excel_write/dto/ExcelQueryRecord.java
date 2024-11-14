@@ -25,7 +25,8 @@ public record ExcelQueryRecord(
                 apartmentTransaction.getGeography() == null ? null : apartmentTransaction.getGeography().getX(),
                 apartmentTransaction.getGeography() == null ? null : apartmentTransaction.getGeography().getY(),
                 apartmentTransaction.getDealAmount(),
-                AddressUtils.getRoadNameWithSeoulPrefixAndGu(dongEntity.getGu(), apartmentTransaction.getRoadName(), apartmentTransaction.getRoadNameBonbun(), apartmentTransaction.getRoadNameBubun())
+                AddressUtils.getJibunAddress(dongEntity.getGu(), dongEntity.getDongName(), apartmentTransaction.getJibun())
+                        .orElse(null)
         );
     }
 }
