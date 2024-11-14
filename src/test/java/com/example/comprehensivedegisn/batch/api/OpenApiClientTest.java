@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.api;
+package com.example.comprehensivedegisn.batch.api;
 
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
