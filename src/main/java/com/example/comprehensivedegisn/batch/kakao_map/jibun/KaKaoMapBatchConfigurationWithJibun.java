@@ -127,7 +127,7 @@ public class KaKaoMapBatchConfigurationWithJibun {
     public Step kaKaoMapStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
                 .<TransactionWithGu, Future<ApartmentGeoRecord>>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(querydslPagingItemReader())
+                .reader(querydslPagingItemReader(null))
                 .processor(asyncKaKaoMapProcessor())
                 .writer(kaKaoMapWriter)
                 .build();
