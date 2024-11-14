@@ -75,11 +75,11 @@ clean {
     delete file(queryDslDir)
 }
 
-task CodeIntegrationTest(type : Test) {
-    group = "verification"
-    description = "Runs the integration tests."
+tasks.register('CodeIntegrationTest', Test) {
+    group = 'verification'
+    description = 'Runs the CI tests.'
     useJUnitPlatform {
-        excludeTags 'BATCH_TAG'
+        excludeTags 'BATCH_TEST'
     }
 }
 
