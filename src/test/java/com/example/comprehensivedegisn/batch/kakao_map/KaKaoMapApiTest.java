@@ -1,5 +1,6 @@
-package com.example.comprehensivedegisn.kakao_map;
+package com.example.comprehensivedegisn.batch.kakao_map;
 
+import com.example.comprehensivedegisn.batch.BatchTag;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
 import org.junit.jupiter.api.Test;
@@ -9,13 +10,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest
-@ActiveProfiles("prod")
+@BatchTag
 public class KaKaoMapApiTest {
 
     @Autowired

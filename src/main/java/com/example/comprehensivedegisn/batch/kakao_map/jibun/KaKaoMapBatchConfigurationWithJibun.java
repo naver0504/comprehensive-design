@@ -1,9 +1,9 @@
 package com.example.comprehensivedegisn.batch.kakao_map.jibun;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
-import com.example.comprehensivedegisn.batch.api_client.KaKaoApiClientWithJibun;
+import com.example.comprehensivedegisn.api_client.KaKaoApiClientWithJibun;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoMapBaseConfiguration;
-import com.example.comprehensivedegisn.batch.api_client.ApiClient;
+import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;

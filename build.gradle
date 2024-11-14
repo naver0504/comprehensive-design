@@ -1,10 +1,16 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
 }
 
-group = 'com.example'
+group = 'budda'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -69,9 +75,14 @@ clean {
     delete file(queryDslDir)
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.generatedSourceOutputDirectory = file(queryDslDir)
-    // Enable java.lang.reflect.Parameter during compile task
-    options.compilerArgs << "-parameters"
+tasks.register('CodeIntegrationTest', Test) {
+    group = 'verification'
+    description = 'Runs the CI tests.'
+    useJUnitPlatform {
+        excludeTags 'BATCH_TEST'
+    }
 }
 
+jar {
+    enabled = false
+}

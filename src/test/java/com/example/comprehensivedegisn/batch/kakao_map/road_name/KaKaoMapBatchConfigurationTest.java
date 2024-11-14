@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
-import com.example.comprehensivedegisn.domain.Gu;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.batch.BatchTag;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -16,8 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @SpringBatchTest
-@ActiveProfiles("prod")
-class KaKaoMapBatchConfigurationTest {
+@BatchTag
+class KaKaoMapBatchConfigurationTest   {
 
     @Autowired
     private BeanFactory beanFactory;
@@ -27,11 +27,6 @@ class KaKaoMapBatchConfigurationTest {
     @Autowired
     private JobRepositoryTestUtils jobRepositoryTestUtils;
 
-
-    @BeforeEach
-    public void clearMetadata() {
-        jobRepositoryTestUtils.removeJobExecutions();
-    }
     @Test
     public void readerTest() throws Exception {
 

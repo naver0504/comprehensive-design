@@ -1,10 +1,10 @@
 package com.example.comprehensivedegisn.batch.kakao_map.road_name;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
-import com.example.comprehensivedegisn.batch.api_client.KaKaoApiClientWithRoadName;
+import com.example.comprehensivedegisn.api_client.KaKaoApiClientWithRoadName;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoMapBaseConfiguration;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
-import com.example.comprehensivedegisn.batch.api_client.ApiClient;
+import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
