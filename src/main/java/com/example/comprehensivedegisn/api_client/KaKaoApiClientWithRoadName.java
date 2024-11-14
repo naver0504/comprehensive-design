@@ -23,7 +23,7 @@ import java.util.Optional;
  * Because the road name address is not used in the current system.
  */
 @Slf4j
-@Deprecated(forRemoval = true)
+@Deprecated
 public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransaction, ApartmentGeoRecord> {
 
     @Value("#{jobParameters[regionalCode]}")
