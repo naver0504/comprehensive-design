@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.api;
+package com.example.comprehensivedegisn.batch.api;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
