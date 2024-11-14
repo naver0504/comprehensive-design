@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.batch.kakao_map.jibun;
 
+import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.batch.CacheRepository;
 import com.example.comprehensivedegisn.api_client.KaKaoApiClientWithJibun;
 import com.example.comprehensivedegisn.batch.kakao_map.KaKaoMapBaseConfiguration;
@@ -24,6 +25,7 @@ import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -84,8 +86,10 @@ public class KaKaoMapBatchConfigurationWithJibun {
 
     @Bean(name = STEP_NAME + " Reader")
     @StepScope
-    public QuerydslNoOffsetIdPagingItemReader<TransactionWithGu, Long> querydslPagingItemReader() {
+    public QuerydslNoOffsetIdPagingItemReader<TransactionWithGu, Long> querydslPagingItemReader(@Value("#{jobParameters[regionalCode]}") String regionalCode) {
 
+
+        Gu gu = Gu.getGuFromRegionalCode(regionalCode);
         QuerydslNoOffsetNumberOptions<TransactionWithGu, Long> options =
                 new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
 
@@ -99,9 +103,8 @@ public class KaKaoMapBatchConfigurationWithJibun {
                 )
                 .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.eq(dongEntity))
-                .where(
-                        apartmentTransaction.geography.isNull()
-                ));
+                .where(dongEntity.gu.eq(gu))
+        );
     }
 
     @Bean(name = STEP_NAME + " Processor")
@@ -124,7 +127,7 @@ public class KaKaoMapBatchConfigurationWithJibun {
     public Step kaKaoMapStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
                 .<TransactionWithGu, Future<ApartmentGeoRecord>>chunk(CHUNK_SIZE, platformTransactionManager)
-                .reader(querydslPagingItemReader())
+                .reader(querydslPagingItemReader(null))
                 .processor(asyncKaKaoMapProcessor())
                 .writer(kaKaoMapWriter)
                 .build();

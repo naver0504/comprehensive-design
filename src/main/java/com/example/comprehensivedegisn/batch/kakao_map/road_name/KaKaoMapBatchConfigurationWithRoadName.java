@@ -33,10 +33,17 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 import java.util.concurrent.Future;
 
+/***
+ *
+ * @deprecated
+ * Because the road name address is not used in the current system.
+ * Use {@link com.example.comprehensivedegisn.batch.kakao_map.jibun.KaKaoMapBatchConfigurationWithJibun} instead.
+ */
 @Configuration
 @EnableConfigurationProperties(KaKaoRestApiProperties.class)
 @Slf4j
 @Import(KaKaoMapBaseConfiguration.class)
+@Deprecated
 public class KaKaoMapBatchConfigurationWithRoadName {
 
     private static final String JOB_NAME = "kakaoMapJobWithRoadName";

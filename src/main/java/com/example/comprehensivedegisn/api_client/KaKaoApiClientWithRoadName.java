@@ -14,7 +14,16 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
+
+/***
+ *
+ * @deprecated
+ * This class is deprecated and will be removed in the future.
+ * Use {@link KaKaoApiClientWithJibun} instead.
+ * Because the road name address is not used in the current system.
+ */
 @Slf4j
+@Deprecated
 public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransaction, ApartmentGeoRecord> {
 
     @Value("#{jobParameters[regionalCode]}")
@@ -33,26 +42,28 @@ public class KaKaoApiClientWithRoadName extends KaKaoApiClient<ApartmentTransact
     @Override
     public ApartmentGeoRecord callApi(ApartmentTransaction apartmentTransaction) {
 
-        Optional<String> roadNameAddress = apartmentTransaction.getRoadNameAddress();
-        LocationRecord roadNameLocationRecord = roadNameAddress.isPresent() ?
-                roadNameCacheRepository.computeIfAbsent(
-                        roadNameAddress.get(),
-                        roadNm -> {
-                            Documents documents = restTemplate
-                                    .exchange(
-                                            createUrl(apartmentTransaction),
-                                            HttpMethod.GET,
-                                            createHttpEntity(),
-                                            Documents.class)
-                                    .getBody();
-                            return documents.toLocationRecord();
-                        }) : LocationRecord.EMPTY;
-
-        return roadNameLocationRecord.toApartmentGeoRecord(apartmentTransaction.getId());
+//        Optional<String> roadNameAddress = apartmentTransaction.getRoadNameAddress();
+//        LocationRecord roadNameLocationRecord = roadNameAddress.isPresent() ?
+//                roadNameCacheRepository.computeIfAbsent(
+//                        roadNameAddress.get(),
+//                        roadNm -> {
+//                            Documents documents = restTemplate
+//                                    .exchange(
+//                                            createUrl(apartmentTransaction),
+//                                            HttpMethod.GET,
+//                                            createHttpEntity(),
+//                                            Documents.class)
+//                                    .getBody();
+//                            return documents.toLocationRecord();
+//                        }) : LocationRecord.EMPTY;
+//
+//        return roadNameLocationRecord.toApartmentGeoRecord(apartmentTransaction.getId());
+        return null;
     }
 
     @Override
     protected String getLocation(ApartmentTransaction apartmentTransaction) {
-        return apartmentTransaction.getRoadNameWithGu(Gu.getGuFromRegionalCode(regionalCode));
+//        return apartmentTransaction.getRoadNameWithGu(Gu.getGuFromRegionalCode(regionalCode));
+        return null;
     }
 }

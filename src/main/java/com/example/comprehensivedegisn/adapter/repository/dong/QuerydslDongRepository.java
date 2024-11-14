@@ -20,7 +20,7 @@ public class QuerydslDongRepository {
     public Map<String, Integer> findByGuToMap(Gu gu){
         return query.selectFrom(dongEntity)
                 .where(dongEntity.gu.eq(gu))
-                .transform(GroupBy.groupBy(dongEntity.dongCode).as(dongEntity.id));
+                .transform(GroupBy.groupBy(dongEntity.dongName).as(dongEntity.id));
     }
 
 }

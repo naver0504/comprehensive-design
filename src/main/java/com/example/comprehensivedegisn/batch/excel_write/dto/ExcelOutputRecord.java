@@ -15,7 +15,7 @@ public record ExcelOutputRecord(
         Double x,
         Double y,
         String dealAmount,
-        String roadNameAddress
+        String jibun
 ) {
 
 }
