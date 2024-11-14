@@ -1,5 +1,6 @@
-package com.example.comprehensivedegisn.api;
+package com.example.comprehensivedegisn.batch.api;
 
+import com.example.comprehensivedegisn.batch.BatchTag;
 import com.example.comprehensivedegisn.batch.open_api.JdbcTemplateConfig;
 import com.example.comprehensivedegisn.batch.open_api.OpenApiBatchConfiguration;
 import com.example.comprehensivedegisn.api_client.OpenApiClient;
@@ -26,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ComponentScan(basePackageClasses = {OpenApiBatchConfiguration.class, DongRepository.class})
 @Import({OpenApiClient.class, TestBatchConfig.class, JdbcTemplateConfig.class})
 @SpringBatchTest
-@ActiveProfiles("local")
+@BatchTag
 public class BatchTest  {
 
 

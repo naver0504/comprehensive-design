@@ -75,14 +75,11 @@ clean {
     delete file(queryDslDir)
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.generatedSourceOutputDirectory = file(queryDslDir)
-    // Enable java.lang.reflect.Parameter during compile task
-    options.compilerArgs << "-parameters"
-    onlyIf {
-        def activeProfile = project.hasProperty('spring.profiles.active') ? project.getProperty('spring.profiles.active') : ""
-        def isCI = System.getenv("CI") == "true"
-        !(isCI && activeProfile == "local")
+tasks.register('CodeIntegrationTest', Test) {
+    group = 'verification'
+    description = 'Runs the CI tests.'
+    useJUnitPlatform {
+        excludeTags 'BATCH_TEST'
     }
 }
 

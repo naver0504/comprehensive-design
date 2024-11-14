@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.batch.kakao_map.jibun;
 
+import com.example.comprehensivedegisn.batch.BatchTag;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBatchTest
 @SpringBootTest
-@ActiveProfiles("local")
+@BatchTag
 class KaKaoMapBatchWithJibunConfigurationTest {
 
     @Autowired
