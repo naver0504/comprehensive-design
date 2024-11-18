@@ -1,6 +1,8 @@
-package com.example.comprehensivedegisn.api_client;
+package com.example.comprehensivedegisn.api_client.open_api;
 
 
+import com.example.comprehensivedegisn.api_client.ApiClient;
+import com.example.comprehensivedegisn.api_client.dto.OpenApiRequest;
 import com.example.comprehensivedegisn.batch.open_api.OpenAPiProperties;
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import lombok.RequiredArgsConstructor;

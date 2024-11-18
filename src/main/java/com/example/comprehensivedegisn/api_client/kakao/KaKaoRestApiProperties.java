@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.kakao_map;
+package com.example.comprehensivedegisn.api_client.kakao;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,6 +1,6 @@
-package com.example.comprehensivedegisn.api_client;
+package com.example.comprehensivedegisn.api_client.kakao;
 
-import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
+import com.example.comprehensivedegisn.api_client.ApiClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

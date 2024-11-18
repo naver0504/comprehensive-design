@@ -1,18 +1,12 @@
-package com.example.comprehensivedegisn.api_client;
+package com.example.comprehensivedegisn.api_client.kakao;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
-import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
-import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
-import com.example.comprehensivedegisn.adapter.domain.Gu;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Optional;
 
 
 /***
