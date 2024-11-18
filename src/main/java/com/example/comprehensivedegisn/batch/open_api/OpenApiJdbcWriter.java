@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
@@ -44,7 +45,10 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
     public void write(Chunk<? extends ApartmentDetailResponse> chunk)  {
         ApartmentDetailResponse apartmentDetailResponse = chunk.getItems().get(0);
 
-        List<ApartmentDetail> items = apartmentDetailResponse.body().items();
+        List<ApartmentDetail> items = apartmentDetailResponse.body().items()
+                .stream()
+                .filter(apartmentDetail -> openApiDongDataHolder.getDongEntityId(apartmentDetail.dongName().trim()) != null)
+                .toList();
 
         jdbcTemplate.batchUpdate(INSERT_SQL, new BatchPreparedStatementSetter() {
             @Override
