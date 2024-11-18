@@ -78,3 +78,4 @@ jobs:
             sudo docker rmi $(docker images | grep "comprehensive-design-backend") -f
             sudo docker pull naver0504/comprehensive-design-backend:latest
             sudo docker run -d --name backend -p 8080:8080 --restart unless-stopped naver0504/comprehensive-design-backend/latest
+            sudo docker network connect ubuntu_comprehensive_design_network backend
