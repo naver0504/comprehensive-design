@@ -3,7 +3,7 @@ package com.example.comprehensivedegisn.batch.api;
 import com.example.comprehensivedegisn.batch.BatchTag;
 import com.example.comprehensivedegisn.batch.open_api.JdbcTemplateConfig;
 import com.example.comprehensivedegisn.batch.open_api.OpenApiBatchConfiguration;
-import com.example.comprehensivedegisn.api_client.OpenApiClient;
+import com.example.comprehensivedegisn.api_client.open_api.OpenApiClient;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
