@@ -1,0 +1,91 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  pull_request:
+    branches: [ "master" ]
+permissions: write-all
+
+env:
+  PROPERTY_DIR: src/main/resources
+jobs:
+  test:
+    name: Run Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Github action IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+       
+      - name: Setting environment variables
+        run: |
+           echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
+           echo "AWS_SG_NAME=default" >> $GITHUB_ENV
+         
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          aws-region: ap-northeast-2
+     
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32    
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+         
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set application.yml
+        env:
+          PROPERTY_FILE: ${{ secrets.TEST_YML }}
+          PROPERTY_FILE_NAME: application.yml
+        run: echo $PROPERTY_FILE | base64 --decode > $PROPERTY_DIR/$PROPERTY_FILE_NAME
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Git Actions cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Test with Gradle
+        run: ./gradlew CodeIntegrationTest --info 
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: ${{ always() }}
+        with:
+          files: build/test-results/**/*.xml
+
+      - name: Remove Github Actions IP from security group
+        if: ${{ always() }}
+        run: |
+          aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2

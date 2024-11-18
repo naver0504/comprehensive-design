@@ -1,13 +1,3 @@
-open:
-  api:
-#    end-point: http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev?_wadl&type=xml
-    end-point: http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTrade
-#    service-key: ruGWumGhfqpbu0QB9wx61m7UE9x1%2FbWN9V%2Btk%2BCeiAyIibISDjsloov6ICHpZFtz5KcEn8nsZtJIEee1BIZanw%3D%3D
-    service-key: ruGWumGhfqpbu0QB9wx61m7UE9x1/bWN9V+tk+CeiAyIibISDjsloov6ICHpZFtz5KcEn8nsZtJIEee1BIZanw==
-
-
-
-
 #comprehensive-degisn
 spring:
   application:
