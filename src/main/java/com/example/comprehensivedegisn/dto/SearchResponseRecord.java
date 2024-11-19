@@ -4,18 +4,18 @@ import com.example.comprehensivedegisn.adapter.domain.Gu;
 
 import java.time.LocalDate;
 public record SearchResponseRecord(
-        Long id,
+        long id,
         String apartmentName,
         String region,
-        Double areaForExclusiveUse,
+        double areaForExclusiveUse,
         LocalDate dealDate,
-        String dealAmount,
+        int dealAmount,
         long predictedCost,
         boolean isReliable
 ) {
 
-    public SearchResponseRecord(Long id, String apartmentName, Gu gu, String dongName, Double areaForExclusiveUse,
-                                LocalDate dealDate, String dealAmount, long predictedCost, boolean isReliable) {
+    public SearchResponseRecord(long id, String apartmentName, Gu gu, String dongName, double areaForExclusiveUse,
+                                LocalDate dealDate, int dealAmount, long predictedCost, boolean isReliable) {
         this(id, apartmentName, createRegion(gu, dongName), areaForExclusiveUse, dealDate, dealAmount, predictedCost, isReliable);
     }
 

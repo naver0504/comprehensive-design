@@ -4,6 +4,7 @@ import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
+import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.dto.SearchResponseRecord;
 import com.example.comprehensivedegisn.dto.SearchCondition;
 import com.querydsl.core.types.Projections;
@@ -11,7 +12,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -57,7 +57,7 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
         ).fetch();
 
         long totalCount = (cachedCount != null) ? cachedCount : getCount(searchCondition);
-        return new PageImpl<>(elements, pageable, totalCount);
+        return new CustomPageImpl<>(elements, pageable, totalCount);
     }
 
 
