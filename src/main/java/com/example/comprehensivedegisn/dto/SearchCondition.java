@@ -6,11 +6,17 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-import static com.example.comprehensivedegisn.adapter.domain.QPredictCost.predictCost;
-
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+/***
+ * public으로 선언된 생성자를 찾는다.
+ * 없다면, public이 아닌 생성자 중에 매개변수 개수가 제일 적은 생성자를 선택한다. (보통 기본 생성자)
+ * 찾은 생성자가 고유하다면, 해당 생성자를 선택한다.
+ * 찾은 생성자가 여러개라면, 매개변수가 제일 적은 생성자를 선택한다.
+ *
+ */
+@NoArgsConstructor
 @Getter
 @AllArgsConstructor
+@ToString
 public class SearchCondition {
 
     private Gu gu = Gu.NONE;
@@ -21,10 +27,10 @@ public class SearchCondition {
     private LocalDate startDealDate;
     private LocalDate endDealDate;
 
-    private Reliability reliability;
+    private Reliability reliability = Reliability.ALL;
 
     public BooleanExpression toReliabilityEq() {
-        return reliability.reliabilityExpression;
+        return reliability.getReliabilityExpression();
     }
 
     public boolean isNotValid() {
@@ -41,20 +47,5 @@ public class SearchCondition {
 
     private boolean isDongNotValidate() {
         return gu == Gu.NONE && dong != null;
-    }
-
-
-    @Getter
-    public enum Reliability {
-        ALL(predictCost.isReliable.in(true, false)),
-        RELIABLE(predictCost.isReliable.isTrue()),
-        UNRELIABLE(predictCost.isReliable.isFalse());
-
-        private final BooleanExpression reliabilityExpression;
-
-        Reliability(BooleanExpression reliabilityExpression) {
-            this.reliabilityExpression = reliabilityExpression;
-        }
-
     }
 }
