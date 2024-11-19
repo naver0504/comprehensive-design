@@ -16,6 +16,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({java.lang.annotation.ElementType.TYPE})
 @Import(QuerydslTestConfiguration.class)
-@ComponentScan(basePackages = {"com.example.comprehensivedegisn.adapter.repository"})
+@ComponentScan(basePackages = {"com.example.comprehensivedegisn.adapter"})
 public @interface BaseRepositoryTest {
 }
