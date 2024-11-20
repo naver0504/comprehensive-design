@@ -19,7 +19,7 @@ public class ApartmentTransaction {
 
     private String apartmentName;
     private int buildYear;
-    private String dealAmount;
+    private int dealAmount;
     private int dealYear;
     private int dealMonth;
     private int dealDay;

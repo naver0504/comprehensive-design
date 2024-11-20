@@ -19,7 +19,9 @@ public class PredictCost {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    private int predictedCost;
+    private long predictedCost;
+
+    private boolean isReliable;
 
     @Enumerated(EnumType.STRING)
     private PredictStatus predictStatus;

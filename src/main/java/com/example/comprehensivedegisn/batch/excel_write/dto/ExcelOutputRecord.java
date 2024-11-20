@@ -14,7 +14,7 @@ public record ExcelOutputRecord(
         int buildYear,
         Double x,
         Double y,
-        String dealAmount,
+        int dealAmount,
         String jibun
 ) {
 

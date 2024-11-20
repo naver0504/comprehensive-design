@@ -1,12 +1,14 @@
 package com.example.comprehensivedegisn.adapter.repository.apart;
 
-import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.*;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.adapter.repository.BaseRepositoryTest;
+import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
+import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
+import com.example.comprehensivedegisn.dto.Reliability;
 import com.example.comprehensivedegisn.dto.SearchCondition;
-import com.example.comprehensivedegisn.dto.TransactionResponseRecord;
-import org.assertj.core.api.Assertions;
+import com.example.comprehensivedegisn.dto.SearchResponseRecord;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,43 +16,163 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.example.comprehensivedegisn.adapter.order.CustomPageable.*;
+import static org.assertj.core.api.Assertions.*;
 
 @BaseRepositoryTest
-class QuerydslApartmentTransactionRepositoryTest {
+public class QuerydslApartmentTransactionRepositoryTest {
+
+
+    private static final Gu TEST_GU = Gu.마포구;
+
+    public static final String TEST_APT_NAME = "TestAptName";
+    public static final String TEST_DONG = "TestDong";
+    public static final double TEST_AREA = 111.1083;
+    public static final int DEAL_AMOUNT = 1000;
+    public static final LocalDate TEST_START_DATE = LocalDate.of(2021, 1, 1);
+    public static final LocalDate TEST_END_DATE = LocalDate.of(2021, 12, 31);
 
     @Autowired
-    private QuerydslApartmentTransactionRepository querydslApartmentTransactionRepository;
+    private QuerydslApartmentTransactionRepository target;
+
+    @Autowired
+    private ApartmentTransactionRepository apartmentTransactionRepository;
+    @Autowired
+    private DongRepository dongRepository;
+    @Autowired
+    private PredictCostRepository predictCostRepository;
 
     @ParameterizedTest
     @MethodSource("searchStream")
     void searchTest(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
+        // given
+        setEntities();
 
         // when
-        Page<TransactionResponseRecord> result = querydslApartmentTransactionRepository.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
+        Page<SearchResponseRecord> result = target.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
+        List<SearchResponseRecord> contents = result.getContent();
+
         // then
-        Assertions.assertThat(result.getSize()).isEqualTo(CustomPageable.DEFAULT_SIZE);
-        if(searchCondition.getStartDealDate() != null && searchCondition.getEndDealDate() != null) {
-            Assertions.assertThat(result.getContent())
-                    .extracting(TransactionResponseRecord::dealDate)
-                    .allMatch(dealDate -> dealDate.isAfter(searchCondition.getStartDealDate()) || dealDate.isEqual(searchCondition.getStartDealDate()))
-                    .allMatch(dealDate -> dealDate.isBefore(searchCondition.getEndDealDate()) || dealDate.isEqual(searchCondition.getEndDealDate()));;
-        }
-        if(cachedCount != null) {
-            Assertions.assertThat(result.getTotalElements()).isEqualTo(cachedCount);
+        assertThat(result.getSize()).isEqualTo(DEFAULT_SIZE);
+        assertThatGuEq(searchCondition, contents);
+        assertThatDongEq(searchCondition, contents);
+        asserThatAptNameEq(searchCondition, contents);
+        assertThatLocalDateBetween(searchCondition, contents);
+        assertThatCacheEq(cachedCount, searchCondition, customPageable, result);
+        assertThatAreaEq(searchCondition, contents);
+        assertThatReliabilityEq(searchCondition, contents);
+    }
+
+    private void setEntities() {
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder()
+                .gu(TEST_GU)
+                .dongName(TEST_DONG)
+                .build());
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < DEFAULT_SIZE; j++) {
+                ApartmentTransaction apartmentTransaction = apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                        .apartmentName(TEST_APT_NAME)
+                        .areaForExclusiveUse(TEST_AREA * i)
+                        .dealAmount(DEAL_AMOUNT * i)
+                        .dongEntity(dongEntity)
+                        .dealDate(TEST_START_DATE.plusMonths(i))
+                        .build());
+
+                if(j % 2 == 0) {
+                    predictCostRepository.save(PredictCost.builder()
+                            .apartmentTransaction(apartmentTransaction)
+                            .predictedCost(1000L)
+                            .isReliable(true)
+                            .predictStatus(PredictStatus.RECENT)
+                            .build());
+                } else {
+                    predictCostRepository.save(PredictCost.builder()
+                            .apartmentTransaction(apartmentTransaction)
+                            .predictedCost(1000L)
+                            .isReliable(false)
+                            .predictStatus(PredictStatus.RECENT)
+                            .build());
+                }
+            }
         }
     }
 
-    private static Stream<Arguments> searchStream() {
+    public static Stream<Arguments> searchStream() {
         return Stream.of(
-                Arguments.of(100L , new SearchCondition(Gu.마포구, null, null, null, LocalDate.of(2021, 1, 1), LocalDate.of(2021, 12, 31)), new CustomPageable(OrderType.DEAL_DATE, 3)),
-                Arguments.of(null , new SearchCondition(Gu.마포구, "아현동", "마포센트럴 아이파크", 111.1083, LocalDate.of(2021, 1, 1), LocalDate.of(2021, 12, 31)), new CustomPageable(OrderType.DEAL_AMOUNT, 0)),
-                Arguments.of(100L , new SearchCondition(Gu.마포구, null, "마포센트럴 아이파크", null, LocalDate.of(2021, 1, 1), null), new CustomPageable(OrderType.DEAL_AMOUNT, 3)),
-                Arguments.of(null , new SearchCondition(Gu.마포구, "아현동", null, 111.1083, null, null), new CustomPageable(OrderType.DEAL_AMOUNT, 0)),
-                Arguments.of(100L , new SearchCondition(Gu.NONE, null, "마포센트럴 아이파크", null, null, null), new CustomPageable(OrderType.DEAL_AMOUNT, 3))
+                Arguments.of(100L , new SearchCondition(TEST_GU, null, null, null, TEST_START_DATE, TEST_END_DATE, Reliability.ALL), new CustomPageable(OrderType.DEAL_DATE, 1)),
+                Arguments.of(null , new SearchCondition(TEST_GU, TEST_DONG, TEST_APT_NAME, TEST_AREA, TEST_START_DATE, TEST_END_DATE, Reliability.UNRELIABLE), new CustomPageable(OrderType.DEAL_AMOUNT, 0)),
+                Arguments.of(100L , new SearchCondition(TEST_GU, TEST_DONG, TEST_APT_NAME, null, TEST_START_DATE, null, Reliability.RELIABLE), new CustomPageable(OrderType.DEAL_AMOUNT, 3)),
+                Arguments.of(null , new SearchCondition(TEST_GU, TEST_DONG, TEST_APT_NAME, TEST_AREA, null, null, Reliability.ALL), new CustomPageable(OrderType.DEAL_AMOUNT, 0)),
+                Arguments.of(100L , new SearchCondition(Gu.NONE, null, null, null, null, null, Reliability.UNRELIABLE), new CustomPageable(OrderType.DEAL_AMOUNT, 2))
 
         );
     }
+
+    private void assertThatCacheEq(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable, Page<SearchResponseRecord> result) {
+        if(cachedCount != null) {
+            assertThat(result.getTotalElements()).isEqualTo(cachedCount);
+        } else {
+            assertThat(result.getTotalElements()).isEqualTo(target.searchApartmentTransactions(null, searchCondition, customPageable).getTotalElements());
+        }
+    }
+
+    private void assertThatLocalDateBetween(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getStartDealDate() != null && searchCondition.getEndDealDate() != null) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::dealDate)
+                    .allMatch(dealDate -> dealDate.isAfter(searchCondition.getStartDealDate()) || dealDate.isEqual(searchCondition.getStartDealDate()))
+                    .allMatch(dealDate -> dealDate.isBefore(searchCondition.getEndDealDate()) || dealDate.isEqual(searchCondition.getEndDealDate()));;
+        }
+    }
+
+    private void asserThatAptNameEq(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getApartmentName() != null) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::apartmentName)
+                    .allMatch(apartmentName -> apartmentName.contains(searchCondition.getApartmentName()));
+        }
+    }
+
+    private void assertThatDongEq(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getDong() != null) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::region)
+                    .allMatch(region -> region.contains(searchCondition.getDong()));
+        }
+    }
+
+    private void assertThatGuEq(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getGu() != Gu.NONE) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::region)
+                    .allMatch(region -> region.contains(searchCondition.getGu().toString()));
+        }
+    }
+
+    private void assertThatAreaEq(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getAreaForExclusiveUse() != null) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::areaForExclusiveUse)
+                    .allMatch(area -> area.equals(searchCondition.getAreaForExclusiveUse()));
+        }
+    }
+
+    private void assertThatReliabilityEq(SearchCondition searchCondition, List<SearchResponseRecord> contents) {
+        if(searchCondition.getReliability() != Reliability.ALL) {
+            assertThat(contents)
+                    .extracting(SearchResponseRecord::isReliable)
+                    .allMatch(isReliable -> {
+                        if(searchCondition.getReliability() == Reliability.RELIABLE) {
+                            return isReliable;
+                        } else {
+                            return !isReliable;
+                        }
+                    });
+        }
+    }
+
+
 }

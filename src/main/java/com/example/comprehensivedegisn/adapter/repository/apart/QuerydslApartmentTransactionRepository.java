@@ -2,15 +2,16 @@ package com.example.comprehensivedegisn.adapter.repository.apart;
 
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.QTransactionResponseRecord;
-import com.example.comprehensivedegisn.dto.TransactionResponseRecord;
+import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
+import com.example.comprehensivedegisn.dto.SearchResponseRecord;
 import com.example.comprehensivedegisn.dto.SearchCondition;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
@@ -23,6 +24,7 @@ import java.util.Objects;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
 import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
+import static com.example.comprehensivedegisn.adapter.domain.QPredictCost.*;
 
 
 @Repository
@@ -35,27 +37,27 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
 
     private final JPAQueryFactory querydsl;
 
-    public Page<TransactionResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
+    public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
         Pageable pageable = customPageable.toPageable();
 
-        List<TransactionResponseRecord> elements = querydsl().applyPagination(pageable, buildApartmentSearchQuery(searchCondition)
-                .select(
-                        new QTransactionResponseRecord(
+        List<SearchResponseRecord> elements = querydsl().applyPagination(pageable, buildApartmentSearchQuery(searchCondition)
+                        .select(Projections.constructor(SearchResponseRecord.class,
                                 apartmentTransaction.id,
                                 apartmentTransaction.apartmentName,
                                 dongEntity.gu,
                                 dongEntity.dongName,
                                 apartmentTransaction.areaForExclusiveUse,
                                 apartmentTransaction.dealDate,
-                                apartmentTransaction.dealAmount
-                        )
-                )
+                                apartmentTransaction.dealAmount,
+                                predictCost.predictedCost,
+                                predictCost.isReliable
+                        ))
                 .orderBy(customPageable.orderBy())
 
         ).fetch();
 
         long totalCount = (cachedCount != null) ? cachedCount : getCount(searchCondition);
-        return new PageImpl<>(elements, pageable, totalCount);
+        return new CustomPageImpl<>(elements, pageable, totalCount);
     }
 
 
@@ -65,12 +67,15 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
         return querydsl
                 .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
+                .innerJoin(predictCost).on(apartmentTransaction.id.eq(predictCost.apartmentTransaction.id))
                 .where(
                         eqGu(searchCondition.getGu()),
                         eqDong(searchCondition.getDong()),
                         eqApartmentName(searchCondition.getApartmentName()),
                         eqAreaForExclusiveUse(searchCondition.getAreaForExclusiveUse()),
-                        betweenDealDate(searchCondition.getStartDealDate(), searchCondition.getEndDealDate())
+                        betweenDealDate(searchCondition.getStartDealDate(), searchCondition.getEndDealDate()),
+                        eqRecentPredictStatus(),
+                        searchCondition.toReliabilityEq()
                 );
     }
 
@@ -107,5 +112,9 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
         startDealDate = Objects.isNull(startDealDate) ? LocalDate.of(2006, 1, 1) : startDealDate;
         endDealDate = Objects.isNull(endDealDate) ? LocalDate.now() : endDealDate;
         return apartmentTransaction.dealDate.between(startDealDate, endDealDate);
+    }
+
+    private BooleanExpression eqRecentPredictStatus() {
+        return predictCost.predictStatus.eq(PredictStatus.RECENT);
     }
 }
