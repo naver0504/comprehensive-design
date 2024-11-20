@@ -6,7 +6,7 @@ import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
-import com.example.comprehensivedegisn.config.ControllerAdvice;
+import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.controller.integration.config.IntegrationTestForController;
 import com.example.comprehensivedegisn.dto.SearchResponseRecord;

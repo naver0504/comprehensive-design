@@ -3,7 +3,7 @@ package com.example.comprehensivedegisn.controller.unit;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
-import com.example.comprehensivedegisn.config.ControllerAdvice;
+import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.dto.SearchCondition;
