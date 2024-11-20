@@ -7,6 +7,8 @@ import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransac
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
+import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
+import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.controller.integration.config.IntegrationTestForController;
 import com.example.comprehensivedegisn.dto.SearchResponseRecord;
@@ -61,8 +63,9 @@ public class ApartmentTransactionControllerIntegrationTest {
         // given
         long count = 100L;
         Gu gu = Gu.마포구;
-        String dong = "testDong";
+        String dong = null;
         String apartmentName = "testApartmentName";
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
 
         // when
         ResultActions resultActions = mockMvc.perform(get("/apartment-transactions")
@@ -70,10 +73,14 @@ public class ApartmentTransactionControllerIntegrationTest {
                 .param("gu", gu.name())
                 .param("dong", dong)
                 .param("apartmentName", apartmentName)
+                .accept(MediaType.APPLICATION_JSON)
         );
 
         // then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
     }
 
     @Test

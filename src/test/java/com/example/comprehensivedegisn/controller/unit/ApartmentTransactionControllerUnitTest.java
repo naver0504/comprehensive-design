@@ -4,6 +4,8 @@ import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
+import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
+import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.dto.SearchCondition;
@@ -113,6 +115,7 @@ public class ApartmentTransactionControllerUnitTest {
         String dong = null;
         String apartmentName = "testApartmentName";
 
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
         BDDMockito.given(apartmentTransactionService.searchApartmentTransactions(any(Long.class), any(SearchCondition.class), any(CustomPageable.class)))
                 .willThrow(new IllegalStateException("검색 조건이 올바르지 않습니다."));
 
@@ -121,10 +124,14 @@ public class ApartmentTransactionControllerUnitTest {
                 .param("cachedCount", Long.toString(count))
                 .param("dong", dong)
                 .param("gu", gu.name())
-                .param("apartmentName", apartmentName));
+                .param("apartmentName", apartmentName)
+                .accept(MediaType.APPLICATION_JSON));
 
         // then
         resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
         BDDMockito.verify(apartmentTransactionService, BDDMockito.times(1))
                 .searchApartmentTransactions(any(Long.class), any(SearchCondition.class), any(CustomPageable.class));
     }
