@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.kakao_map;
 
 import com.example.comprehensivedegisn.batch.BatchTag;
-import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
+import com.example.comprehensivedegisn.api_client.kakao.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

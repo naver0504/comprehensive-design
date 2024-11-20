@@ -1,7 +1,6 @@
-package com.example.comprehensivedegisn.api_client;
+package com.example.comprehensivedegisn.api_client.kakao;
 
 import com.example.comprehensivedegisn.batch.CacheRepository;
-import com.example.comprehensivedegisn.batch.kakao_map.KaKaoRestApiProperties;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.ApartmentGeoRecord;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.Documents;
 import com.example.comprehensivedegisn.batch.kakao_map.dto.LocationRecord;
