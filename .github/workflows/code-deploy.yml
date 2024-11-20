@@ -75,10 +75,10 @@ jobs:
           host: ${{ secrets.HOST_PROD }} # EC2 퍼블릭 IPv4 DNS
           username: ubuntu
           key: ${{ secrets.EC2_PEM_KEY }}
-          envs: GITHUB_SHA
+          port: 22
           script: |
             docker stop backend && docker rm backend
             sudo docker rmi $(docker images | grep "comprehensive-design-backend") -f
             sudo docker pull naver0504/comprehensive-design-backend:latest
-            sudo docker run -d --name backend -p 8080:8080 --restart unless-stopped naver0504/comprehensive-design-backend/latest
+            sudo docker run -d --name backend -p 8080:8080 --restart unless-stopped naver0504/comprehensive-design-backend:latest
             sudo docker network connect ubuntu_comprehensive_design_network backend
