@@ -1,24 +1,22 @@
 package com.example.comprehensivedegisn.adapter.order;
 
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
-import com.example.comprehensivedegisn.adapter.domain.Gu;
 
+import com.example.comprehensivedegisn.adapter.repository.BaseRepositoryTest;
+import com.querydsl.core.types.dsl.PathBuilderFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.support.Querydsl;
 
 import java.util.List;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
-import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
-
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@BaseRepositoryTest
 class CustomPageableTest {
 
 
@@ -26,34 +24,39 @@ class CustomPageableTest {
     private EntityManager entityManager;
 
     private JPAQueryFactory queryFactory;
+    private Querydsl querydsl;
 
     @BeforeEach
     void setUp(){
         queryFactory = new JPAQueryFactory(entityManager);
+        querydsl = new Querydsl(entityManager, (new PathBuilderFactory()).create(ApartmentTransaction.class));
     }
-
     @Test
-    void queryFactoryTest(){
-        Assertions.assertThat(queryFactory).isNotNull();
-    }
 
-    @Test
     void DEAL_AMOUNT_TEST() {
         // given
         OrderType orderType = OrderType.DEAL_AMOUNT;
         Order asc = Order.ASC;
+        int pageId = 3;
 
-        CustomPageable orderExpression = new CustomPageable(asc, orderType);
+        CustomPageable customPageable = new CustomPageable(asc, orderType, pageId);
+        Pageable pageable = customPageable.toPageable();
+
         // when
-        List<ApartmentTransaction> apartmentTransactions = queryFactory.selectFrom(apartmentTransaction)
-                .orderBy(orderExpression.orderBy())
-                .limit(10)
-                .fetch();
+        List<ApartmentTransaction> apartmentTransactions =
+                querydsl
+                        .applyPagination(pageable,
+                                queryFactory.selectFrom(apartmentTransaction)
+                                .orderBy(customPageable.orderBy()))
+                        .fetch();
+
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
+        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getDealAmount)
                 .isSorted();
+
     }
 
     @Test
@@ -61,15 +64,21 @@ class CustomPageableTest {
         // given
         OrderType orderType = OrderType.AREA_FOR_EXCLUSIVE_USE;
         Order asc = Order.ASC;
+        int pageId = 1;
 
-        CustomPageable orderExpression = new CustomPageable(asc, orderType);
+        CustomPageable customPageable = new CustomPageable(asc, orderType, pageId);
+        Pageable pageable = customPageable.toPageable();
+
         // when
-        List<ApartmentTransaction> apartmentTransactions = queryFactory.selectFrom(apartmentTransaction)
-                .orderBy(orderExpression.orderBy())
-                .limit(10)
+        List<ApartmentTransaction> apartmentTransactions =  querydsl
+                .applyPagination(pageable,
+                        queryFactory.selectFrom(apartmentTransaction)
+                                .orderBy(customPageable.orderBy()))
                 .fetch();
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
+        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
+
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getAreaForExclusiveUse)
                 .isSorted();
@@ -80,18 +89,20 @@ class CustomPageableTest {
         // given
         OrderType orderType = OrderType.DEAL_DATE;
         Order asc = Order.ASC;
+        int pageId = 2;
 
-        CustomPageable orderExpression = new CustomPageable(asc, orderType);
+        CustomPageable customPageable = new CustomPageable(asc, orderType, pageId);
+        Pageable pageable = customPageable.toPageable();
+
         // when
-        List<ApartmentTransaction> apartmentTransactions = queryFactory.selectFrom(apartmentTransaction)
-                .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.eq(dongEntity))
-                .where(dongEntity.gu.eq(Gu.마포구))
-                .orderBy(orderExpression.orderBy())
-                .limit(10)
-                .offset(2)
+        List<ApartmentTransaction> apartmentTransactions =  querydsl
+                .applyPagination(pageable,
+                        queryFactory.selectFrom(apartmentTransaction)
+                                .orderBy(customPageable.orderBy()))
                 .fetch();
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
+        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getDealDate)
                 .isSorted();
