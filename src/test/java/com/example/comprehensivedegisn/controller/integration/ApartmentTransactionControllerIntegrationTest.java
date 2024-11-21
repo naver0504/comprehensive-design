@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepositoryTest.*;
@@ -61,6 +62,7 @@ public class ApartmentTransactionControllerIntegrationTest {
     @Test
     void searchApartmentTransactions_With_Not_Valid_Input() throws Exception {
         // given
+        String url = "/apartment-transactions";
         long count = 100L;
         Gu gu = Gu.마포구;
         String dong = null;
@@ -68,7 +70,7 @@ public class ApartmentTransactionControllerIntegrationTest {
         CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/apartment-transactions")
+        ResultActions resultActions = mockMvc.perform(get(url)
                 .param("count", String.valueOf(count))
                 .param("gu", gu.name())
                 .param("dong", dong)
@@ -114,7 +116,128 @@ public class ApartmentTransactionControllerIntegrationTest {
         Assertions.assertThat(contents.getContent()).isEqualTo(expected);
     }
 
+    @Test
+    void findApartmentNames_With_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/apartment-name";
+        Gu gu = Gu.서초구;
+        String dong = TEST_DONG;
+        String aptName = TEST_APT_NAME;
+
+        DongEntity dontEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
+        int repeat = 3;
+        for (int i = 0; i < repeat; i++) {
+            apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                    .apartmentName(aptName + i)
+                    .dongEntity(dontEntity)
+                    .build());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        List<SearchResponseRecord> contents = objectMapper.readValue(result, new TypeReference<>() {});
+        Assertions.assertThat(contents).hasSize(repeat);
+        Assertions.assertThat(contents)
+                .extracting(SearchResponseRecord::apartmentName)
+                .allMatch(name -> name.startsWith(aptName));
+    }
+
+    @Test
+    void findApartmentNames_With_Not_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/apartment-name";
+        Gu gu = Gu.서초구;
+        String dong = null;
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
+    @Test
+    void findAreaForExclusive_With_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/area";
+        Gu gu = Gu.서초구;
+        String dong = TEST_DONG;
+        String aptName = TEST_APT_NAME;
+        double area = TEST_AREA;
+
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
+        int repeat = 3;
+        List<Double> expected = new ArrayList<>(repeat);
+        for (int i = 0; i < repeat; i++) {
+            double areaForExclusiveUse = area * i;
+            expected.add(areaForExclusiveUse);
+            apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                    .apartmentName(aptName)
+                    .dongEntity(dongEntity)
+                    .areaForExclusiveUse(areaForExclusiveUse)
+                    .build());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .param("apartmentName", aptName)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        List<SearchResponseRecord> contents = objectMapper.readValue(result, new TypeReference<>() {});
+        Assertions.assertThat(contents).hasSize(repeat);
+        Assertions.assertThat(contents)
+                .extracting(SearchResponseRecord::areaForExclusiveUse)
+                .containsExactlyInAnyOrderElementsOf(expected);
+    }
+
+    @Test
+    void findAreaForExclusive_With_Not_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/area";
+        Gu gu = Gu.서초구;
+        String dong = null;
+        String aptName = TEST_APT_NAME;
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .param("apartmentName", aptName)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
     private List<SearchResponseRecord> setEntities(int dealAmount, String aptName, LocalDate startDate, Double area, Gu gu, String dong) {
+
         DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
 
         ApartmentTransaction firstAT = apartmentTransactionRepository.save(ApartmentTransaction.builder()
