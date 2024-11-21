@@ -12,6 +12,7 @@ import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.controller.integration.config.IntegrationTestForController;
 import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -235,6 +236,59 @@ public class ApartmentTransactionControllerIntegrationTest {
         CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
         Assertions.assertThat(content).isEqualTo(expectedError);
     }
+
+    @Test
+    void findTransactionDetail_With_Valid_Input() throws Exception {
+        // given
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(Gu.마포구).dongName(TEST_DONG).build());
+        ApartmentTransaction apartmentTransaction = apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                .apartmentName(TEST_APT_NAME)
+                .dongEntity(dongEntity)
+                .areaForExclusiveUse(TEST_AREA)
+                .dealDate(TEST_START_DATE)
+                .dealAmount(1000)
+                .build());
+        PredictCost predictCost = predictCostRepository.save(PredictCost.builder()
+                .apartmentTransaction(apartmentTransaction)
+                .predictedCost(1000L)
+                .predictStatus(PredictStatus.RECENT)
+                .build());
+
+        String url = "/apartment-transactions/" + apartmentTransaction.getId();
+        TransactionDetailResponse expected = new TransactionDetailResponse(TEST_START_DATE, apartmentTransaction.getBuildYear(), TEST_AREA, apartmentTransaction.getDealingGbn(), TEST_APT_NAME, apartmentTransaction.getDealAmount(), predictCost.getPredictedCost(), null);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        TransactionDetailResponse content = objectMapper.readValue(result, TransactionDetailResponse.class);
+        Assertions.assertThat(content).isEqualTo(expected);
+    }
+
+    @Test
+    void findTransactionDetail_With_Not_Valid_Input() throws Exception {
+        // given
+        long id = -100L;
+        String url = "/apartment-transactions/" + id;
+
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "잘못 된 거래 Id 입니다.");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
 
     private List<SearchResponseRecord> setEntities(int dealAmount, String aptName, LocalDate startDate, Double area, Gu gu, String dong) {
 
