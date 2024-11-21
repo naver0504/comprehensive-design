@@ -1,6 +1,7 @@
-package com.example.comprehensivedegisn.dto;
+package com.example.comprehensivedegisn.dto.request;
 
 import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.dto.Reliability;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.*;
 import org.springframework.util.StringUtils;

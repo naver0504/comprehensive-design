@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.dto;
+package com.example.comprehensivedegisn.dto.response;
 
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 
