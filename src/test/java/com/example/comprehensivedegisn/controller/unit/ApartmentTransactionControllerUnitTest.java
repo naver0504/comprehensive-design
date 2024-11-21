@@ -8,8 +8,7 @@ import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
-import com.example.comprehensivedegisn.dto.SearchCondition;
-import com.example.comprehensivedegisn.dto.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.*;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -117,7 +116,7 @@ public class ApartmentTransactionControllerUnitTest {
 
         CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
         BDDMockito.given(apartmentTransactionService.searchApartmentTransactions(any(Long.class), any(SearchCondition.class), any(CustomPageable.class)))
-                .willThrow(new IllegalStateException("검색 조건이 올바르지 않습니다."));
+                .willThrow(new IllegalArgumentException("검색 조건이 올바르지 않습니다."));
 
         // when
         ResultActions resultActions = mockMvc.perform(get(url)
@@ -134,5 +133,114 @@ public class ApartmentTransactionControllerUnitTest {
         Assertions.assertThat(content).isEqualTo(expectedError);
         BDDMockito.verify(apartmentTransactionService, BDDMockito.times(1))
                 .searchApartmentTransactions(any(Long.class), any(SearchCondition.class), any(CustomPageable.class));
+    }
+
+    @Test
+    void findApartmentNames_With_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/apartment-name";
+        Gu gu = Gu.강동구;
+        String dong = "testDong";
+
+        List<SearchApartNameResponse> expected = List.of(
+                new SearchApartNameResponse("testAptName1"),
+                new SearchApartNameResponse("testAptName2")
+        );
+
+        BDDMockito.given(apartmentTransactionService.findApartmentNames(any(SearchApartNameRequest.class)))
+                .willReturn(expected);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        List<SearchApartNameResponse> content = objectMapper.readValue(result, new TypeReference<>() {});
+        Assertions.assertThat(content).isEqualTo(expected);
+    }
+
+    @Test
+    void findApartmentNames_With_Not_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/apartment-name";
+        Gu gu = Gu.강동구;
+        String dong = null;
+
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
+        BDDMockito.given(apartmentTransactionService.findApartmentNames(any(SearchApartNameRequest.class)))
+                .willThrow(new IllegalArgumentException("검색 조건이 올바르지 않습니다."));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
+    @Test
+    void findAreaForExclusive_With_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/area";
+        Gu gu = Gu.강남구;
+        String dong = "testDong";
+        String apartmentName = "testAptName";
+
+        List<SearchAreaResponse> expected = List.of(
+                new SearchAreaResponse(100.1),
+                new SearchAreaResponse(100.2)
+        );
+
+        BDDMockito.given(apartmentTransactionService.findAreaForExclusive(any(SearchAreaRequest.class)))
+                .willReturn(expected);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/apartment-transactions/area")
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .param("apartmentName", apartmentName)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        List<SearchAreaResponse> content = objectMapper.readValue(result, new TypeReference<>() {
+        });
+        Assertions.assertThat(content).isEqualTo(expected);
+    }
+
+    @Test
+    void findAreaForExclusive_With_Not_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/area";
+        Gu gu = Gu.강남구;
+        String dong = null;
+        String apartmentName = "testAptName";
+
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "검색 조건이 올바르지 않습니다.");
+        BDDMockito.given(apartmentTransactionService.findAreaForExclusive(any(SearchAreaRequest.class)))
+                .willThrow(new IllegalArgumentException("검색 조건이 올바르지 않습니다."));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .param("gu", gu.name())
+                .param("dong", dong)
+                .param("apartmentName", apartmentName)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
     }
 }
