@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.controller.unit;
 
+import com.example.comprehensivedegisn.adapter.domain.DealingGbn;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
@@ -14,6 +15,7 @@ import com.example.comprehensivedegisn.dto.request.SearchCondition;
 import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,7 +80,7 @@ public class ApartmentTransactionControllerUnitTest {
         List<SearchResponseRecord> expectedContents = List.of(
                 new SearchResponseRecord(1L, apartmentName, gu, dong, 100.1, LocalDate.of(2021, 1, 1), 10300, 1000L, true),
                 new SearchResponseRecord(2L, apartmentName, gu, dong, 100.2, LocalDate.of(2021, 1, 2), 10200, 1000L, true)
-                );
+        );
 
         PageImpl<SearchResponseRecord> expectedResult = new PageImpl<>(expectedContents, new CustomPageable(orderType, 1).toPageable(), count);
         BDDMockito.given(apartmentTransactionService.searchApartmentTransactions(any(Long.class), any(SearchCondition.class), any(CustomPageable.class)))
@@ -100,7 +102,8 @@ public class ApartmentTransactionControllerUnitTest {
         resultActions.andExpect(status().isOk());
         String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         System.out.println(result);
-        CustomPageImpl<SearchResponseRecord> resultPageImpl = objectMapper.readValue(result, new TypeReference<>() {});
+        CustomPageImpl<SearchResponseRecord> resultPageImpl = objectMapper.readValue(result, new TypeReference<>() {
+        });
         List<SearchResponseRecord> resultContents = resultPageImpl.getContent();
 
         Assertions.assertThat(resultContents).isEqualTo(expectedContents);
@@ -164,7 +167,8 @@ public class ApartmentTransactionControllerUnitTest {
         // then
         resultActions.andExpect(status().isOk());
         String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
-        List<SearchApartNameResponse> content = objectMapper.readValue(result, new TypeReference<>() {});
+        List<SearchApartNameResponse> content = objectMapper.readValue(result, new TypeReference<>() {
+        });
         Assertions.assertThat(content).isEqualTo(expected);
     }
 
@@ -248,4 +252,44 @@ public class ApartmentTransactionControllerUnitTest {
         CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
         Assertions.assertThat(content).isEqualTo(expectedError);
     }
+
+    @Test
+    void findTransactionDetail_With_Valid_Input() throws Exception {
+        // given
+        long id = 100L;
+        String url = "/apartment-transactions/" + id;
+
+        TransactionDetailResponse expected = new TransactionDetailResponse(LocalDate.of(2021, 1, 1), 1990, 100.1, DealingGbn.중개거래, "testAptName", 10000, 1000L, null);
+        BDDMockito.given(apartmentTransactionService.findTransactionDetail(id))
+                .willReturn(expected);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void findTransactionDetail_With_Not_Valid_Input() throws Exception {
+        // given
+        long id = -100L;
+        String url = "/apartment-transactions/" + id;
+
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "잘못 된 거래 Id 입니다.");
+        BDDMockito.given(apartmentTransactionService.findTransactionDetail(id))
+                .willThrow(new IllegalArgumentException("잘못 된 거래 Id 입니다."));
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
 }

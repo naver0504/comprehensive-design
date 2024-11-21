@@ -13,12 +13,14 @@ import com.example.comprehensivedegisn.dto.request.SearchCondition;
 import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import com.example.comprehensivedegisn.service.integration.config.IntegrationTestForService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
@@ -153,7 +155,38 @@ public class ApartmentTransactionServiceIntegrationTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    public void findTransactionDetail_With_Valid_Id() {
+        // given
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(Gu.서초구).dongName(TEST_DONG).build());
+        ApartmentTransaction apartmentTransaction = apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                .apartmentName(TEST_APT_NAME)
+                .dongEntity(dongEntity)
+                .dealAmount(1000)
+                .areaForExclusiveUse(TEST_AREA)
+                .build());
+        PredictCost predictCost = predictCostRepository.save(PredictCost.builder()
+                .apartmentTransaction(apartmentTransaction)
+                .predictedCost(1000L)
+                .predictStatus(PredictStatus.RECENT)
+                .build());
 
+        TransactionDetailResponse expected = new TransactionDetailResponse(apartmentTransaction.getDealDate(), apartmentTransaction.getBuildYear(), apartmentTransaction.getAreaForExclusiveUse(), apartmentTransaction.getDealingGbn(), apartmentTransaction.getApartmentName(), apartmentTransaction.getDealAmount(), predictCost.getPredictedCost(), null);
+
+        // when
+        TransactionDetailResponse result = target.findTransactionDetail(apartmentTransaction.getId());
+        // then
+        Assertions.assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void findTransactionDetail_With_Not_Valid_Id() {
+        // given
+        long id = -100L;
+        // when & then
+        Assertions.assertThatThrownBy(() -> target.findTransactionDetail(id))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 
     private List<SearchResponseRecord> setEntities(int dealAmount, String aptName, LocalDate startDate, double area, Gu gu, String dong) {
         DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
