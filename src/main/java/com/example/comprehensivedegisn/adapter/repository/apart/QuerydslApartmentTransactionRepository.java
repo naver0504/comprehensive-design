@@ -5,6 +5,8 @@ import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
+import com.example.comprehensivedegisn.dto.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.SearchResponseRecord;
 import com.example.comprehensivedegisn.dto.SearchCondition;
 import com.querydsl.core.types.Projections;
@@ -37,6 +39,23 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
 
     private final JPAQueryFactory querydsl;
 
+    public List<SearchApartNameResponse> findApartmentNames(Gu gu, String dongName) {
+        return buildApartmentsWithDongQuery(gu, dongName)
+                .select(Projections.constructor(SearchApartNameResponse.class, apartmentTransaction.apartmentName))
+                .groupBy(apartmentTransaction.apartmentName)
+                .fetch();
+    }
+
+
+
+    public List<SearchAreaResponse> findAreaForExclusive(Gu gu, String dongName, String apartmentName) {
+        return  buildApartmentsWithDongQuery(gu, dongName)
+                .where(apartmentTransaction.apartmentName.eq(apartmentName))
+                .select(Projections.constructor(SearchAreaResponse.class, apartmentTransaction.areaForExclusiveUse))
+                .groupBy(apartmentTransaction.areaForExclusiveUse)
+                .fetch();
+    }
+
     public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
         Pageable pageable = customPageable.toPageable();
 
@@ -60,6 +79,17 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
         return new CustomPageImpl<>(elements, pageable, totalCount);
     }
 
+
+    private JPAQuery<?> buildApartmentsWithDongQuery(Gu gu, String dongName) {
+        return querydsl
+                .from(apartmentTransaction)
+                .distinct()
+                .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
+                .where(
+                        eqGu(gu),
+                        eqDong(dongName)
+                );
+    }
 
     // 한 메소드에서 두 번 JpaQuery를 사용하면 두 번째 JpaQuery에서는
     // 첫 번째 JpaQuery에서 사용한 from, join 등이 초기화되어 있지 않아서 예외 또는 잘못된 결과가 나올 수 있습니다.

@@ -3,6 +3,7 @@ package com.example.comprehensivedegisn.dto;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 
@@ -38,14 +39,14 @@ public class SearchCondition {
     }
 
     private boolean isAreaNotValid() {
-        return apartmentName == null && areaForExclusiveUse != null;
+        return !StringUtils.hasText(apartmentName) && areaForExclusiveUse != null;
     }
 
     private boolean isApartmentNameNotValid() {
-        return dong == null && apartmentName != null;
+        return !StringUtils.hasText(dong) && StringUtils.hasText(apartmentName);
     }
 
     private boolean isDongNotValidate() {
-        return gu == Gu.NONE && dong != null;
+        return gu == Gu.NONE && StringUtils.hasText(dong);
     }
 }

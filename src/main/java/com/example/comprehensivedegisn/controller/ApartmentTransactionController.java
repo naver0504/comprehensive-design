@@ -1,14 +1,15 @@
 package com.example.comprehensivedegisn.controller;
 
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.SearchCondition;
-import com.example.comprehensivedegisn.dto.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.*;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +35,17 @@ public class ApartmentTransactionController {
 
         return ResponseEntity.ok(apartmentTransactionService.searchApartmentTransactions(cachedCount, searchCondition, customPageable));
     }
+
+    @GetMapping("/apartment-transactions/apartment-name")
+    public ResponseEntity<List<SearchApartNameResponse>> findApartmentNames(SearchApartNameRequest request) {
+        return ResponseEntity.ok(apartmentTransactionService.findApartmentNames(request));
+    }
+
+    @GetMapping("/apartment-transactions/area")
+    public ResponseEntity<List<SearchAreaResponse>> findAreaForExclusiveUses(SearchAreaRequest request) {
+        return ResponseEntity.ok(apartmentTransactionService.findAreaForExclusive(request));
+    }
+
 
 
 }

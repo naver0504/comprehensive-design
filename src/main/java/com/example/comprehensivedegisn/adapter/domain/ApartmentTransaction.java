@@ -4,7 +4,6 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Entity
 @Table(name = "apartment_transaction")
