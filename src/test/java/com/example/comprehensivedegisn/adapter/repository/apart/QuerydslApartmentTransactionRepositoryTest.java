@@ -6,9 +6,8 @@ import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.adapter.repository.BaseRepositoryTest;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
-import com.example.comprehensivedegisn.dto.Reliability;
-import com.example.comprehensivedegisn.dto.SearchCondition;
-import com.example.comprehensivedegisn.dto.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -44,6 +44,65 @@ public class QuerydslApartmentTransactionRepositoryTest {
     private DongRepository dongRepository;
     @Autowired
     private PredictCostRepository predictCostRepository;
+
+    @Test
+    public void findApartmentNamesTest() {
+        // given
+        int repeat = 3;
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder()
+                .gu(TEST_GU)
+                .dongName(TEST_DONG)
+                .build());
+        for (int i = 0; i < repeat; i++) {
+            for (int j = 0; j < 2; j++) {
+                apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                        .apartmentName(TEST_APT_NAME + i)
+                        .dongEntity(dongEntity)
+                        .build());
+            }
+        }
+
+        // when
+        List<SearchApartNameResponse> result = target.findApartmentNames(TEST_GU, TEST_DONG);
+
+        // then
+        assertThat(result).hasSize(repeat);
+        assertThat(result)
+                .extracting(SearchApartNameResponse::apartmentName)
+                .allMatch(apartmentName -> apartmentName.startsWith(TEST_APT_NAME));
+    }
+
+    @Test
+    public void findAreaForExclusiveTest() {
+        // given
+        int repeat = 3;
+        List<Double> expected = new ArrayList<>(repeat);
+
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder()
+                .gu(TEST_GU)
+                .dongName(TEST_DONG)
+                .build());
+        for (int i = 1; i <= repeat; i++) {
+            double area = TEST_AREA * i;
+            expected.add(area);
+            for (int j = 0; j < 2; j++) {
+                apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                        .apartmentName(TEST_APT_NAME)
+                        .dongEntity(dongEntity)
+                        .areaForExclusiveUse(area)
+                        .build());
+            }
+        }
+
+        // when
+        List<SearchAreaResponse> result = target.findAreaForExclusive(TEST_GU, TEST_DONG, TEST_APT_NAME);
+
+        // then
+        assertThat(result).hasSize(repeat);
+        assertThat(result)
+                .extracting(SearchAreaResponse::areaForExclusiveUse)
+                .containsExactlyInAnyOrderElementsOf(expected);
+    }
 
     @ParameterizedTest
     @MethodSource("searchStream")
