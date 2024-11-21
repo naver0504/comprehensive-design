@@ -2,7 +2,12 @@ package com.example.comprehensivedegisn.service;
 
 import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
+import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;

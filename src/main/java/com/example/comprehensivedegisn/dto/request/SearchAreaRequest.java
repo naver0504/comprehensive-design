@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.dto;
+package com.example.comprehensivedegisn.dto.request;
 
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import lombok.AllArgsConstructor;
@@ -9,13 +9,22 @@ import org.springframework.util.StringUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class SearchApartNameRequest {
+public class SearchAreaRequest{
 
     private Gu gu;
     private String dong;
+    private String apartmentName;
 
     public boolean isNotValid() {
-        return isGuNotValid() | !StringUtils.hasText(dong);
+        return isGuNotValid() | isDongNotValidate() || isApartmentNameNotValid();
+    }
+
+    private boolean isApartmentNameNotValid() {
+        return !StringUtils.hasText(apartmentName);
+    }
+
+    private boolean isDongNotValidate() {
+        return !StringUtils.hasText(dong);
     }
 
     private boolean isGuNotValid() {

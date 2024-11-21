@@ -7,6 +7,12 @@ import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransac
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
 import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
+import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import com.example.comprehensivedegisn.service.integration.config.IntegrationTestForService;
 import org.assertj.core.api.Assertions;

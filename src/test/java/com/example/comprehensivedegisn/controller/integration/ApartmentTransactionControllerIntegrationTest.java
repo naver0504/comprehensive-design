@@ -11,7 +11,7 @@ import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.controller.integration.config.IntegrationTestForController;
-import com.example.comprehensivedegisn.dto.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

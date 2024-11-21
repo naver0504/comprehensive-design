@@ -3,10 +3,10 @@ package com.example.comprehensivedegisn.adapter;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.SearchApartNameResponse;
-import com.example.comprehensivedegisn.dto.SearchAreaResponse;
-import com.example.comprehensivedegisn.dto.SearchCondition;
-import com.example.comprehensivedegisn.dto.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
