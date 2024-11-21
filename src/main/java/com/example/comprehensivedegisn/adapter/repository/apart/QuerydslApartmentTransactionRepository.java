@@ -9,6 +9,7 @@ import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -23,6 +24,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
 import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.dongEntity;
@@ -32,9 +34,12 @@ import static com.example.comprehensivedegisn.adapter.domain.QPredictCost.*;
 @Repository
 public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySupport {
 
-    public QuerydslApartmentTransactionRepository(JPAQueryFactory querydsl) {
+    private final JPAQueryFactory jpaQueryFactory;
+
+    public QuerydslApartmentTransactionRepository(JPAQueryFactory querydsl, JPAQueryFactory jpaQueryFactory) {
         super(ApartmentTransaction.class);
         this.querydsl = querydsl;
+        this.jpaQueryFactory = jpaQueryFactory;
     }
 
     private final JPAQueryFactory querydsl;
@@ -46,14 +51,33 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                 .fetch();
     }
 
-
-
     public List<SearchAreaResponse> findAreaForExclusive(Gu gu, String dongName, String apartmentName) {
         return  buildApartmentsWithDongQuery(gu, dongName)
                 .where(apartmentTransaction.apartmentName.eq(apartmentName))
                 .select(Projections.constructor(SearchAreaResponse.class, apartmentTransaction.areaForExclusiveUse))
                 .groupBy(apartmentTransaction.areaForExclusiveUse)
                 .fetch();
+    }
+
+    public Optional<TransactionDetailResponse> findTransactionDetail(long id) {
+        return Optional.ofNullable(jpaQueryFactory.from(apartmentTransaction)
+                .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
+                .innerJoin(predictCost).on(apartmentTransaction.id.eq(predictCost.apartmentTransaction.id))
+                .where(
+                        apartmentTransaction.id.eq(id),
+                        eqRecentPredictStatus()
+                )
+                .select(Projections.constructor(TransactionDetailResponse.class,
+                        apartmentTransaction.dealDate,
+                        apartmentTransaction.buildYear,
+                        apartmentTransaction.areaForExclusiveUse,
+                        apartmentTransaction.dealingGbn,
+                        apartmentTransaction.apartmentName,
+                        apartmentTransaction.dealAmount,
+                        predictCost.predictedCost,
+                        apartmentTransaction.geography
+                ))
+                .fetchOne());
     }
 
     public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {

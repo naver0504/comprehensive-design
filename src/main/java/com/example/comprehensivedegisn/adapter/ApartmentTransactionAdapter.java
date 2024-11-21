@@ -7,6 +7,7 @@ import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
 import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -18,4 +19,5 @@ public interface ApartmentTransactionAdapter {
     Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable);
     List<SearchApartNameResponse> findApartmentNames(Gu gu, String dongName);
     List<SearchAreaResponse> findAreaForExclusive(Gu gu, String dongName, String apartmentName);
+    Optional<TransactionDetailResponse> findTransactionDetail(long id);
 }
