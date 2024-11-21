@@ -1,7 +1,13 @@
 package com.example.comprehensivedegisn.controller;
 
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
+import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +20,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ApartmentTransactionController {
-
 
     /**
      * WebDataBinder 통해 직접 필드에 접근할 수 있도록 설정
@@ -46,6 +51,8 @@ public class ApartmentTransactionController {
         return ResponseEntity.ok(apartmentTransactionService.findAreaForExclusive(request));
     }
 
-
-
+    @GetMapping("/apartment-transactions/{id}")
+    public ResponseEntity<TransactionDetailResponse> findTransactionDetail(@PathVariable long id) {
+        return ResponseEntity.ok(apartmentTransactionService.findTransactionDetail(id));
+    }
 }

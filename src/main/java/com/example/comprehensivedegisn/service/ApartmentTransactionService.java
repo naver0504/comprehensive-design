@@ -2,7 +2,13 @@ package com.example.comprehensivedegisn.service;
 
 import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
+import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -30,5 +36,11 @@ public class ApartmentTransactionService {
     public List<SearchAreaResponse> findAreaForExclusive(SearchAreaRequest request) {
         if(request.isNotValid()) throw new IllegalArgumentException("검색 조건이 올바르지 않습니다.");
         return apartmentTransactionAdapter.findAreaForExclusive(request.getGu(), request.getDong(), request.getApartmentName());
+    }
+
+
+    public TransactionDetailResponse findTransactionDetail(long id) {
+        return apartmentTransactionAdapter.findTransactionDetail(id)
+                .orElseThrow(() -> new IllegalArgumentException("잘못 된 거래 Id 입니다."));
     }
 }

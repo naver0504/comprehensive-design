@@ -1,10 +1,18 @@
 package com.example.comprehensivedegisn.service.unit;
 
 import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
+import com.example.comprehensivedegisn.adapter.domain.DealingGbn;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
+import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +27,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,6 +128,39 @@ public class ApartmentTransactionServiceUnitTest {
         Assertions.assertThatThrownBy(() -> apartmentTransactionService.findAreaForExclusive(request))
                 .isInstanceOf(IllegalArgumentException.class);
         BDDMockito.verify(apartmentTransactionAdapter, BDDMockito.times(0)).findAreaForExclusive(request.getGu(), request.getDong(), request.getApartmentName());
+    }
+
+    @Test
+    void findTransactionDetail_With_Valid_Id() {
+        // given
+        long id = 100L;
+        LocalDate dealDate = LocalDate.of(2021, 1, 1);
+        int buildYear = 2000;
+        double exclusiveArea = 100.1;
+        DealingGbn dealingGbn = DealingGbn.중개거래;
+        String apartmentName = "마포센트럴 아이파크";
+        int dealAmount = 1000000;
+        long predictCost = 100000000;
+        TransactionDetailResponse expected = new TransactionDetailResponse(dealDate, buildYear, exclusiveArea, dealingGbn, apartmentName, dealAmount, predictCost, 111.1083, 37.1234);
+
+        BDDMockito.given(apartmentTransactionAdapter.findTransactionDetail(id)).willReturn(Optional.of(expected));
+        // when
+        TransactionDetailResponse result = apartmentTransactionService.findTransactionDetail(id);
+
+        // then
+        Assertions.assertThat(result).isEqualTo(expected);
+        BDDMockito.verify(apartmentTransactionAdapter, BDDMockito.times(1)).findTransactionDetail(id);
+    }
+
+    @Test
+    void findTransactionDetail_With_Not_Valid_Id() {
+        // given
+        long id = 100L;
+        BDDMockito.given(apartmentTransactionAdapter.findTransactionDetail(id)).willReturn(Optional.empty());
+        // when & then
+        Assertions.assertThatThrownBy(() -> apartmentTransactionService.findTransactionDetail(id))
+                .isInstanceOf(IllegalArgumentException.class);
+        BDDMockito.verify(apartmentTransactionAdapter, BDDMockito.times(1)).findTransactionDetail(id);
     }
 
 

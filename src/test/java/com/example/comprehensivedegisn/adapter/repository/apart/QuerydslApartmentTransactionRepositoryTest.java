@@ -7,6 +7,11 @@ import com.example.comprehensivedegisn.adapter.repository.BaseRepositoryTest;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
 import com.example.comprehensivedegisn.dto.*;
+import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
+import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Page;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.example.comprehensivedegisn.adapter.order.CustomPageable.*;
@@ -70,6 +76,50 @@ public class QuerydslApartmentTransactionRepositoryTest {
         assertThat(result)
                 .extracting(SearchApartNameResponse::apartmentName)
                 .allMatch(apartmentName -> apartmentName.startsWith(TEST_APT_NAME));
+    }
+
+    @Test
+    public void findTransactionDetail_With_Valid_Id() {
+        // given
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder()
+                .gu(TEST_GU)
+                .dongName(TEST_DONG)
+                .build());
+        ApartmentTransaction apartmentTransaction = apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                .apartmentName(TEST_APT_NAME)
+                .dongEntity(dongEntity)
+                .dealDate(LocalDate.now())
+                .buildYear(2021)
+                .areaForExclusiveUse(TEST_AREA)
+                .dealAmount(1000)
+                .dealingGbn(DealingGbn.직거래)
+                .build());
+        PredictCost predictCost = predictCostRepository.save(PredictCost.builder()
+                .apartmentTransaction(apartmentTransaction)
+                .predictedCost(1000L)
+                .predictStatus(PredictStatus.RECENT)
+                .build());
+
+        // when
+        TransactionDetailResponse result = target.findTransactionDetail(apartmentTransaction.getId()).orElseThrow();
+
+        // then
+        assertThat(result.dealDate()).isEqualTo(apartmentTransaction.getDealDate());
+        assertThat(result.buildYear()).isEqualTo(apartmentTransaction.getBuildYear());
+        assertThat(result.areaForExclusiveUse()).isEqualTo(apartmentTransaction.getAreaForExclusiveUse());
+        assertThat(result.dealingGbn()).isEqualTo(apartmentTransaction.getDealingGbn());
+        assertThat(result.apartmentName()).isEqualTo(apartmentTransaction.getApartmentName());
+        assertThat(result.dealAmount()).isEqualTo(apartmentTransaction.getDealAmount());
+        assertThat(result.predictCost()).isEqualTo(predictCost.getPredictedCost());
+    }
+
+    @Test
+    public void findTransactionDetail_With_Not_Valid_Id() {
+        long id = -100L;
+        // when
+        Optional<TransactionDetailResponse> result = target.findTransactionDetail(id);
+        // then
+        assertThat(result).isEmpty();
     }
 
     @Test
