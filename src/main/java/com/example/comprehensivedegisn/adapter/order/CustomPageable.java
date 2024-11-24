@@ -3,12 +3,14 @@ package com.example.comprehensivedegisn.adapter.order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class CustomPageable {
 
     public CustomPageable(Order order, OrderType orderType) {

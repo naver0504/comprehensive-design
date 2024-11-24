@@ -6,6 +6,7 @@ import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.dto.response.PredictAiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
@@ -20,6 +21,8 @@ public class PredictAiApiClient implements ApiClient<ApartmentTransaction, Predi
     }
 
     @Override
+    @Cacheable(value = "predictAi", key = "#apartmentTransaction.dongEntity.gu + ':' + #apartmentTransaction.dongEntity.dongName + ':' " +
+            "+ #apartmentTransaction.areaForExclusiveUse + ':' + #apartmentTransaction.floor + ':' + #apartmentTransaction.buildYear")
     public PredictAiResponse callApi(ApartmentTransaction apartmentTransaction) {
         PredictAiRequest predictAiRequest = new PredictAiRequest(apartmentTransaction);
         return restTemplate.postForObject(createUrl(apartmentTransaction), predictAiRequest, PredictAiResponse.class);
