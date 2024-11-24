@@ -1,6 +1,7 @@
 package com.example.comprehensivedegisn.controller.integration.config;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @ActiveProfiles("test")
+@Import(ControllerTestConfiguration.class)
 @Transactional
 public @interface IntegrationTestForController {
 }

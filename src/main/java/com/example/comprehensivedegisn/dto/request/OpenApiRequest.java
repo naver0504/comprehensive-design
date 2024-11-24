@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.api_client.dto;
+package com.example.comprehensivedegisn.dto.request;
 
 import lombok.extern.slf4j.Slf4j;
 

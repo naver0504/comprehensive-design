@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +27,8 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
     private final QuerydslApartmentTransactionRepository querydslApartmentTransactionRepository;
 
     @Override
-    public Optional<ApartmentTransaction> findById(Long id) {
-        return apartmentTransactionRepository.findById(id);
+    public Optional<ApartmentTransaction> findApartmentTransactionById(Long id) {
+        return apartmentTransactionRepository.findApartmentTransactionById(id);
     }
 
     @Override
@@ -48,6 +49,11 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
     @Override
     public Optional<TransactionDetailResponse> findTransactionDetail(long id) {
         return querydslApartmentTransactionRepository.findTransactionDetail(id);
+    }
+
+    @Override
+    public List<ApartmentTransaction> findApartmentTransactionsForGraph(Gu gu, String dongName, String apartmentName, double areaForExclusiveUse, LocalDate startDate, LocalDate endDate) {
+        return apartmentTransactionRepository.findApartmentTransactionsForGraph(gu, dongName, apartmentName, areaForExclusiveUse, startDate, endDate);
     }
 
 

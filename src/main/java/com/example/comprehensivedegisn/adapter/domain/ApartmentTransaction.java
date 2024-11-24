@@ -4,6 +4,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @Table(name = "apartment_transaction")
@@ -40,4 +41,8 @@ public class ApartmentTransaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interest_id")
     private Interest interest;
+
+    public YearMonth getYearMonth() {
+        return YearMonth.from(dealDate);
+    }
 }

@@ -6,19 +6,20 @@ import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
+import com.example.comprehensivedegisn.api_client.predict.PredictAiApiClient;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
 import com.example.comprehensivedegisn.controller.ApartmentTransactionController;
 import com.example.comprehensivedegisn.controller.integration.config.IntegrationTestForController;
-import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
-import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
+import com.example.comprehensivedegisn.dto.response.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,9 +29,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepositoryTest.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,6 +53,8 @@ public class ApartmentTransactionControllerIntegrationTest {
     private DongRepository dongRepository;
     @Autowired
     private PredictCostRepository predictCostRepository;
+    @Autowired
+    private PredictAiApiClient mockPredictAiApiClient;
 
     @BeforeEach
     void setUp() {
@@ -275,6 +281,74 @@ public class ApartmentTransactionControllerIntegrationTest {
         long id = -100L;
         String url = "/apartment-transactions/" + id;
 
+        CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "잘못 된 거래 Id 입니다.");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        CustomHttpExceptionResponse content = objectMapper.readValue(result, CustomHttpExceptionResponse.class);
+        Assertions.assertThat(content).isEqualTo(expectedError);
+    }
+
+    @Test
+    public void findApartmentTransactionsForGraph_With_Valid_Input() throws Exception {
+        // given
+
+        Gu gu = Gu.성북구;
+        String dong = TEST_DONG;
+        String aptName = TEST_APT_NAME;
+        double area = TEST_AREA;
+
+        int repeatCount = 12;
+        LocalDate dealDate = TEST_END_DATE;
+
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
+        List<ApartmentTransaction> apartmentTransactions = new ArrayList<>();
+        Map<LocalDate, Long> predictData = new HashMap<>();
+        for (int i = 0; i < repeatCount; i++) {
+            predictData.put(dealDate.minusMonths(i), 1000L * i);
+            apartmentTransactions.add(apartmentTransactionRepository.save(ApartmentTransaction.builder()
+                    .dongEntity(dongEntity)
+                    .apartmentName(aptName)
+                    .areaForExclusiveUse(area)
+                    .dealDate(dealDate.minusMonths(i))
+                    .dealAmount(1000 * i)
+                    .build()));
+
+        }
+        ApartmentTransaction apartmentTransaction = apartmentTransactions.get(0);
+        long id = apartmentTransaction.getId();
+        String url = "/apartment-transactions/" + id + "/graph";
+        System.out.println("url = " + url);
+
+        RealTransactionGraphResponse realTransactionGraphResponse = new RealTransactionGraphResponse(apartmentTransactions);
+        PredictAiResponse predictAiResponse = new PredictAiResponse(predictData);
+        GraphResponse expected = new GraphResponse(realTransactionGraphResponse, predictAiResponse);
+
+        BDDMockito.given(mockPredictAiApiClient.callApi(any(ApartmentTransaction.class))).willReturn(predictAiResponse);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get(url)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+        String result = resultActions.andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
+        GraphResponse content = objectMapper.readValue(result, GraphResponse.class);
+        System.out.println("content = " + content);
+        Assertions.assertThat(content).isEqualTo(expected);
+    }
+
+    @Test
+    public void findApartmentTransactionsForGraph_With_Not_Valid_Input() throws Exception {
+        // given
+        String url = "/apartment-transactions/-100/graph";
         CustomHttpExceptionResponse expectedError = new CustomHttpExceptionResponse(CustomHttpDetail.BAD_REQUEST.getStatusCode(), "잘못 된 거래 Id 입니다.");
 
         // when
