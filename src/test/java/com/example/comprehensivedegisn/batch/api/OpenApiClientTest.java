@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.batch.api;
 
 import com.example.comprehensivedegisn.api_client.open_api.OpenApiClient;
-import com.example.comprehensivedegisn.api_client.dto.OpenApiRequest;
+import com.example.comprehensivedegisn.dto.request.OpenApiRequest;
 import com.example.comprehensivedegisn.batch.open_api.OpenAPiProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

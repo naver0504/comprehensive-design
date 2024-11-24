@@ -3,7 +3,7 @@ package com.example.comprehensivedegisn.api_client.predict;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.api_client.ApiClient;
-import com.example.comprehensivedegisn.api_client.dto.PredictAiResponse;
+import com.example.comprehensivedegisn.dto.response.PredictAiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
