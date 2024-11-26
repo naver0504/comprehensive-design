@@ -3,7 +3,6 @@ package com.example.comprehensivedegisn.api_client.open_api;
 
 import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.dto.request.OpenApiRequest;
-import com.example.comprehensivedegisn.batch.open_api.OpenAPiProperties;
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import java.net.URI;
 @Slf4j
 public class OpenApiClient implements ApiClient<OpenApiRequest, ApartmentDetailResponse> {
 
-    private final OpenAPiProperties openAPiProperties;
+    private final OpenApiProperties openAPiProperties;
     private final RestTemplate restTemplate;
     private final int NUM_OF_ROWS;
 

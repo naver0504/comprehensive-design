@@ -6,7 +6,7 @@ import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
-import com.example.comprehensivedegisn.api_client.predict.PredictAiApiClient;
+import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
@@ -54,7 +54,7 @@ public class ApartmentTransactionControllerIntegrationTest {
     @Autowired
     private PredictCostRepository predictCostRepository;
     @Autowired
-    private PredictAiApiClient mockPredictAiApiClient;
+    private PredictApiClientForGraph mockPredictAiApiClient;
 
     @BeforeEach
     void setUp() {
@@ -309,9 +309,9 @@ public class ApartmentTransactionControllerIntegrationTest {
 
         DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
         List<ApartmentTransaction> apartmentTransactions = new ArrayList<>();
-        Map<LocalDate, Long> predictData = new HashMap<>();
+        Map<String, Integer> predictData = new HashMap<>();
         for (int i = 0; i < repeatCount; i++) {
-            predictData.put(dealDate.minusMonths(i), 1000L * i);
+            predictData.put(dealDate.minusMonths(i).toString(), 1000 * i);
             apartmentTransactions.add(apartmentTransactionRepository.save(ApartmentTransaction.builder()
                     .dongEntity(dongEntity)
                     .apartmentName(aptName)
