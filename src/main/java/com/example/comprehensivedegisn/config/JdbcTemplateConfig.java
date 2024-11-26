@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.open_api;
+package com.example.comprehensivedegisn.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
