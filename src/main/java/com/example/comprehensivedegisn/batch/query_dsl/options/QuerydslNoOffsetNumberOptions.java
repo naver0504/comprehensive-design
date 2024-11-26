@@ -82,6 +82,10 @@ public class QuerydslNoOffsetNumberOptions<T, N extends Number & Comparable<?>> 
             return query;
         }
 
+        if(lastId == null) {
+            initLastId(query);
+        }
+
         return query
                 .where(whereExpression(page))
                 .orderBy(orderExpression());

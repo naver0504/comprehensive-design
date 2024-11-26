@@ -1,8 +1,8 @@
 package com.example.comprehensivedegisn.batch.api;
 
 import com.example.comprehensivedegisn.api_client.open_api.OpenApiClient;
-import com.example.comprehensivedegisn.api_client.dto.OpenApiRequest;
-import com.example.comprehensivedegisn.batch.open_api.OpenAPiProperties;
+import com.example.comprehensivedegisn.dto.request.OpenApiRequest;
+import com.example.comprehensivedegisn.api_client.open_api.OpenApiProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 
 @SpringBootTest
-@EnableConfigurationProperties(OpenAPiProperties.class)
+@EnableConfigurationProperties(OpenApiProperties.class)
 @ActiveProfiles("local")
 class OpenApiClientTest  {
 
     @Autowired
-    private OpenAPiProperties openAPiProperties;
+    private OpenApiProperties openAPiProperties;
 
     @Test
     void callApiTest() {

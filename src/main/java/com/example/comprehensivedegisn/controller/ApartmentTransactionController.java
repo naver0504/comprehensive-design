@@ -1,13 +1,12 @@
 package com.example.comprehensivedegisn.controller;
 
+import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
+import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
 import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
 import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
-import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
-import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
-import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
-import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
+import com.example.comprehensivedegisn.dto.response.*;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,12 +25,14 @@ public class ApartmentTransactionController {
      * Setter 통해 바인딩하지 않고 필드에 직접 접근하여 바인딩
      *
      */
+
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.initDirectFieldAccess();
     }
 
     private final ApartmentTransactionService apartmentTransactionService;
+    private final PredictApiClientForGraph predictAiApiClient;
 
     @GetMapping("/apartment-transactions")
     public ResponseEntity<Page<SearchResponseRecord>> searchApartmentTransactions(@RequestParam(required = false) Long cachedCount,
@@ -54,5 +55,13 @@ public class ApartmentTransactionController {
     @GetMapping("/apartment-transactions/{id}")
     public ResponseEntity<TransactionDetailResponse> findTransactionDetail(@PathVariable long id) {
         return ResponseEntity.ok(apartmentTransactionService.findTransactionDetail(id));
+    }
+
+    @GetMapping("/apartment-transactions/{id}/graph")
+    public ResponseEntity<GraphResponse> findApartmentTransactionsForGraph(@PathVariable long id) {
+        ApartmentTransaction apartmentTransaction = apartmentTransactionService.findById(id);
+        RealTransactionGraphResponse realData = apartmentTransactionService.findApartmentTransactionsForGraph(apartmentTransaction);
+        PredictAiResponse predictData = predictAiApiClient.callApi(apartmentTransaction);
+        return ResponseEntity.ok(new GraphResponse(realData, predictData));
     }
 }

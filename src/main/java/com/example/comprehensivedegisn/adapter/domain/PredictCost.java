@@ -29,4 +29,8 @@ public class PredictCost {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "apartment_transaction_id")
     private ApartmentTransaction apartmentTransaction;
+
+    public void updatePredictStatus(PredictStatus predictStatus) {
+        this.predictStatus = predictStatus;
+    }
 }

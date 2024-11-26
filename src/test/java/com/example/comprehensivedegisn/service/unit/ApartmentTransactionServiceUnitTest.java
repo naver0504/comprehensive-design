@@ -1,7 +1,9 @@
 package com.example.comprehensivedegisn.service.unit;
 
 import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
+import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.DealingGbn;
+import com.example.comprehensivedegisn.adapter.domain.DongEntity;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
@@ -9,10 +11,7 @@ import com.example.comprehensivedegisn.dto.*;
 import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
 import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
-import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
-import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
-import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
-import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
+import com.example.comprehensivedegisn.dto.response.*;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepositoryTest.*;
+import static com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepositoryTest.TEST_END_DATE;
 
 @ExtendWith(MockitoExtension.class)
 public class ApartmentTransactionServiceUnitTest {
@@ -161,6 +164,39 @@ public class ApartmentTransactionServiceUnitTest {
         Assertions.assertThatThrownBy(() -> apartmentTransactionService.findTransactionDetail(id))
                 .isInstanceOf(IllegalArgumentException.class);
         BDDMockito.verify(apartmentTransactionAdapter, BDDMockito.times(1)).findTransactionDetail(id);
+    }
+
+    @Test
+    void findApartmentTransactionsForGraph() {
+        // given
+        Gu gu = Gu.성북구;
+        String dong = TEST_DONG;
+        String aptName = TEST_APT_NAME;
+        double area = TEST_AREA;
+
+        int repeatCount = 12;
+        LocalDate endDate = TEST_END_DATE;
+        LocalDate startDate = endDate.minusMonths(repeatCount);
+
+        DongEntity dongEntity = DongEntity.builder().gu(gu).dongName(dong).build();
+        List<ApartmentTransaction> apartmentTransactions = new ArrayList<>();
+        for (int i = 0; i < repeatCount; i++) {
+            apartmentTransactions.add(ApartmentTransaction.builder()
+                    .dongEntity(dongEntity)
+                    .apartmentName(aptName)
+                    .areaForExclusiveUse(area)
+                    .dealDate(endDate.minusMonths(i))
+                    .build());
+        }
+
+        BDDMockito.given(apartmentTransactionAdapter.findApartmentTransactionsForGraph(gu, dong, aptName, area, startDate, endDate)).willReturn(apartmentTransactions);
+        RealTransactionGraphResponse expected = new RealTransactionGraphResponse(apartmentTransactions);
+
+        // when
+        RealTransactionGraphResponse result = apartmentTransactionService.findApartmentTransactionsForGraph(apartmentTransactions.get(0));
+
+        // then
+        Assertions.assertThat(result).isEqualTo(expected);
     }
 
 

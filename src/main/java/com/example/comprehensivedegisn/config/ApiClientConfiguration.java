@@ -1,6 +1,6 @@
 package com.example.comprehensivedegisn.config;
 
-import com.example.comprehensivedegisn.api_client.predict.PredictAiApiClient;
+import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
 import com.example.comprehensivedegisn.api_client.predict.PredictAiProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,8 +26,8 @@ public class ApiClientConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public PredictAiApiClient predictAiApiClient(RestTemplate restTemplate) {
-        return new PredictAiApiClient(restTemplate, predictAiProperties);
+    public PredictApiClientForGraph predictAiApiClient(RestTemplate restTemplate) {
+        return new PredictApiClientForGraph(restTemplate, predictAiProperties);
     }
 
     @Override

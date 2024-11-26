@@ -10,17 +10,13 @@ import com.example.comprehensivedegisn.dto.*;
 import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
 import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
-import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
-import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
-import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
-import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
+import com.example.comprehensivedegisn.dto.response.*;
 import com.example.comprehensivedegisn.service.ApartmentTransactionService;
 import com.example.comprehensivedegisn.service.integration.config.IntegrationTestForService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
@@ -180,12 +176,35 @@ public class ApartmentTransactionServiceIntegrationTest {
     }
 
     @Test
-    public void findTransactionDetail_With_Not_Valid_Id() {
+    void findApartmentTransactionsForGraph() {
         // given
-        long id = -100L;
-        // when & then
-        Assertions.assertThatThrownBy(() -> target.findTransactionDetail(id))
-                .isInstanceOf(IllegalArgumentException.class);
+        Gu gu = Gu.성북구;
+        String dong = TEST_DONG;
+        String aptName = TEST_APT_NAME;
+        double area = TEST_AREA;
+
+        int repeatCount = 12;
+        LocalDate endDate = TEST_END_DATE;
+
+        DongEntity dongEntity = dongRepository.save(DongEntity.builder().gu(gu).dongName(dong).build());
+        List<ApartmentTransaction> apartmentTransactions = new ArrayList<>();
+        for (int i = 0; i < repeatCount; i++) {
+            apartmentTransactions.add(ApartmentTransaction.builder()
+                    .dongEntity(dongEntity)
+                    .apartmentName(aptName)
+                    .areaForExclusiveUse(area)
+                    .dealDate(endDate.minusMonths(i))
+                    .build());
+        }
+        apartmentTransactionRepository.saveAll(apartmentTransactions);
+
+        RealTransactionGraphResponse expected = new RealTransactionGraphResponse(apartmentTransactions);
+
+        // when
+        RealTransactionGraphResponse result = target.findApartmentTransactionsForGraph(apartmentTransactions.get(0));
+
+        // then
+        Assertions.assertThat(result).isEqualTo(expected);
     }
 
     private List<SearchResponseRecord> setEntities(int dealAmount, String aptName, LocalDate startDate, double area, Gu gu, String dong) {

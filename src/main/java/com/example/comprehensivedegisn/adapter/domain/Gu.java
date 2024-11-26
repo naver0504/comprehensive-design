@@ -29,4 +29,7 @@ public enum Gu {
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 구가 없습니다. " + regionalCode));
     }
 
+    public static Gu fromOrdinal(int ordinal) {
+        return guList.get(ordinal);
+    }
 }
