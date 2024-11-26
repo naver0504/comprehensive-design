@@ -2,7 +2,7 @@ package com.example.comprehensivedegisn.controller;
 
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
-import com.example.comprehensivedegisn.api_client.predict.PredictAiApiClient;
+import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
 import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
 import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
@@ -25,13 +25,14 @@ public class ApartmentTransactionController {
      * Setter 통해 바인딩하지 않고 필드에 직접 접근하여 바인딩
      *
      */
+
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.initDirectFieldAccess();
     }
 
     private final ApartmentTransactionService apartmentTransactionService;
-    private final PredictAiApiClient predictAiApiClient;
+    private final PredictApiClientForGraph predictAiApiClient;
 
     @GetMapping("/apartment-transactions")
     public ResponseEntity<Page<SearchResponseRecord>> searchApartmentTransactions(@RequestParam(required = false) Long cachedCount,

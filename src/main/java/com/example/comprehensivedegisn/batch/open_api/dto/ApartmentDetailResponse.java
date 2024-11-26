@@ -17,6 +17,10 @@ public record ApartmentDetailResponse(@JacksonXmlProperty(localName = "header") 
         return body().totalCount() == 0;
     }
 
+    public boolean isEndOfGu() {
+        return body().items().isEmpty();
+    }
+
     public int getTotalCount() {
         return body().totalCount();
     }

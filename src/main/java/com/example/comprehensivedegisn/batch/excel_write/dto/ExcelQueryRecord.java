@@ -22,9 +22,8 @@ public record ExcelQueryRecord(
                 apartmentTransaction.getAreaForExclusiveUse(),
                 apartmentTransaction.getFloor(),
                 apartmentTransaction.getBuildYear(),
-                apartmentTransaction.getGeography() == null ? null : apartmentTransaction.getGeography().getX(),
-                apartmentTransaction.getGeography() == null ? null : apartmentTransaction.getGeography().getY(),
                 apartmentTransaction.getDealAmount(),
+                apartmentTransaction.getApartmentName(),
                 AddressUtils.getJibunAddress(dongEntity.getGu(), dongEntity.getDongName(), apartmentTransaction.getJibun())
                         .orElse(null)
         );

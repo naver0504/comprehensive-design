@@ -4,7 +4,7 @@ import com.example.comprehensivedegisn.adapter.domain.Gu;
 
 import java.time.LocalDate;
 
-public record ExcelOutputRecord(
+public record ExcelOutputRecord (
         LocalDate dealDate,
         double interestRate,
         Gu gu,
@@ -12,10 +12,9 @@ public record ExcelOutputRecord(
         double exclusiveArea,
         int floor,
         int buildYear,
-        Double x,
-        Double y,
         int dealAmount,
-        String jibun
+        String apartmentName,
+        String jibunAddress
 ) {
 
 }

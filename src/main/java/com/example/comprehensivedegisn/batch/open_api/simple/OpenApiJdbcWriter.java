@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.open_api;
+package com.example.comprehensivedegisn.batch.open_api.simple;
 
 
 import com.example.comprehensivedegisn.batch.open_api.dto.ApartmentDetail;

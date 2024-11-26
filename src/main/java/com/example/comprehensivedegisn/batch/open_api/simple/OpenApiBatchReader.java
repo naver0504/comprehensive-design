@@ -1,4 +1,4 @@
-package com.example.comprehensivedegisn.batch.open_api;
+package com.example.comprehensivedegisn.batch.open_api.simple;
 
 import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.dto.request.OpenApiRequest;
