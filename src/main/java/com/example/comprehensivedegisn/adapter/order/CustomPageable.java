@@ -20,7 +20,7 @@ public class CustomPageable {
         this(Order.ASC, orderType, page);
     }
 
-    public static final int DEFAULT_SIZE = 10;
+    public static final int DEFAULT_SIZE = 12;
 
     private Order order = Order.ASC;
     private OrderType orderType = OrderType.DEAL_DATE;
