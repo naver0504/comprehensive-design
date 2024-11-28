@@ -12,6 +12,7 @@ import com.example.comprehensivedegisn.dto.request.SearchCondition;
 import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
@@ -82,16 +83,15 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
     public CustomPageImpl<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
         Pageable pageable = customPageable.toPageable();
         List<SearchResponseRecord> elements =
-         searchCondition.isEmpty() ? getSearchElementsWithEmptyCondition(searchCondition, customPageable) : getSearchElementsWithCondition(searchCondition, customPageable) ;
+                searchCondition.isEmpty() ? getSearchElementsWithEmptyCondition(searchCondition, customPageable) : getSearchElementsWithCondition(searchCondition, customPageable) ;
 
         long totalCount = (cachedCount != null) ? cachedCount : getCount(searchCondition);
         return new CustomPageImpl<>(elements, pageable, totalCount);
     }
 
     private List<SearchResponseRecord> getSearchElementsWithCondition(SearchCondition searchCondition, CustomPageable customPageable) {
-        return selectElements(buildApartmentSearchQuery(searchCondition)
-                .orderBy(customPageable.orderBy())
-        ).fetch();
+        JPQLQuery<?> jpqlQuery = querydsl().applyPagination(customPageable.toPageable(), buildApartmentSearchQuery(searchCondition));
+        return selectElements((JPAQuery<?>) jpqlQuery).fetch();
     }
 
     private List<SearchResponseRecord> getSearchElementsWithEmptyCondition(SearchCondition searchCondition, CustomPageable customPageable) {
