@@ -31,6 +31,11 @@ public class SearchCondition {
 
     private Reliability reliability = Reliability.ALL;
 
+
+    public boolean isEmpty() {
+        return gu == Gu.NONE && !StringUtils.hasText(dong) && !StringUtils.hasText(apartmentName) && areaForExclusiveUse == null;
+    }
+
     public BooleanExpression toReliabilityEq() {
         return reliability.getReliabilityExpression();
     }
