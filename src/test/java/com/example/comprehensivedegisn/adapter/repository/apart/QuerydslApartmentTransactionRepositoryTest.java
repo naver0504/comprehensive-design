@@ -1,5 +1,6 @@
 package com.example.comprehensivedegisn.adapter.repository.apart;
 
+import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
 import com.example.comprehensivedegisn.adapter.domain.*;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
@@ -43,6 +44,8 @@ public class QuerydslApartmentTransactionRepositoryTest {
 
     @Autowired
     private QuerydslApartmentTransactionRepository target;
+    @Autowired
+    private ApartmentTransactionAdapter apartmentTransactionAdapter;
 
     @Autowired
     private ApartmentTransactionRepository apartmentTransactionRepository;
@@ -161,7 +164,7 @@ public class QuerydslApartmentTransactionRepositoryTest {
         setEntities();
 
         // when
-        Page<SearchResponseRecord> result = target.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
+        Page<SearchResponseRecord> result = apartmentTransactionAdapter.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
         List<SearchResponseRecord> contents = result.getContent();
 
         // then
@@ -170,7 +173,7 @@ public class QuerydslApartmentTransactionRepositoryTest {
         assertThatDongEq(searchCondition, contents);
         asserThatAptNameEq(searchCondition, contents);
         assertThatLocalDateBetween(searchCondition, contents);
-        assertThatCacheEq(cachedCount, searchCondition, customPageable, result);
+        assertThatCacheEq(cachedCount, searchCondition, result);
         assertThatAreaEq(searchCondition, contents);
         assertThatReliabilityEq(searchCondition, contents);
     }
@@ -220,11 +223,11 @@ public class QuerydslApartmentTransactionRepositoryTest {
         );
     }
 
-    private void assertThatCacheEq(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable, Page<SearchResponseRecord> result) {
+    private void assertThatCacheEq(Long cachedCount, SearchCondition searchCondition, Page<SearchResponseRecord> result) {
         if(cachedCount != null) {
             assertThat(result.getTotalElements()).isEqualTo(cachedCount);
         } else {
-            assertThat(result.getTotalElements()).isEqualTo(target.searchApartmentTransactions(null, searchCondition, customPageable).getTotalElements());
+            assertThat(result.getTotalElements()).isEqualTo(target.getSearchCount(cachedCount, searchCondition));
         }
     }
 
@@ -233,7 +236,7 @@ public class QuerydslApartmentTransactionRepositoryTest {
             assertThat(contents)
                     .extracting(SearchResponseRecord::dealDate)
                     .allMatch(dealDate -> dealDate.isAfter(searchCondition.getStartDealDate()) || dealDate.isEqual(searchCondition.getStartDealDate()))
-                    .allMatch(dealDate -> dealDate.isBefore(searchCondition.getEndDealDate()) || dealDate.isEqual(searchCondition.getEndDealDate()));;
+                    .allMatch(dealDate -> dealDate.isBefore(searchCondition.getEndDealDate()) || dealDate.isEqual(searchCondition.getEndDealDate()));
         }
     }
 
