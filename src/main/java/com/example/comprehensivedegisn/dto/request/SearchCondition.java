@@ -33,7 +33,7 @@ public class SearchCondition {
 
 
     public boolean isEmpty() {
-        return gu == Gu.NONE && !StringUtils.hasText(dong) && !StringUtils.hasText(apartmentName) && areaForExclusiveUse == null;
+        return gu == Gu.NONE;
     }
 
     public BooleanExpression toReliabilityEq() {
