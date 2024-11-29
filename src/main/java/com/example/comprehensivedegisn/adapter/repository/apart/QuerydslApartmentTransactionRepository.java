@@ -3,7 +3,6 @@ package com.example.comprehensivedegisn.adapter.repository.apart;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
-import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
@@ -80,25 +79,8 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                 .fetchOne());
     }
 
-    public CustomPageImpl<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
-        Pageable pageable = customPageable.toPageable();
-        List<SearchResponseRecord> elements = getSearchElementsWithCondition(searchCondition, customPageable);
-        long totalCount = getSearchCount(cachedCount, searchCondition);
-        return new CustomPageImpl<>(elements, pageable, totalCount);
-    }
-
-
-    public Long getSearchCount(Long cachedCount, SearchCondition searchCondition) {
-        return (cachedCount != null) ? cachedCount : searchCondition.isEmpty()? getCountWithEmptyCondition(searchCondition) : getCount(searchCondition);
-    }
-
-    private List<SearchResponseRecord> getSearchElementsWithCondition(SearchCondition searchCondition, CustomPageable customPageable) {
-        JPQLQuery<?> jpqlQuery = querydsl().applyPagination(customPageable.toPageable(), buildApartmentSearchQuery(searchCondition));
-        return selectElements((JPAQuery<?>) jpqlQuery).fetch();
-    }
-
-    private JPAQuery<SearchResponseRecord> selectElements(JPAQuery<?> query) {
-        return query
+    public List<SearchResponseRecord> searchApartmentTransactions(SearchCondition searchCondition, CustomPageable customPageable) {
+        return querydsl().applyPagination(customPageable.toPageable(), buildApartmentSearchQuery(searchCondition))
                 .select(Projections.constructor(SearchResponseRecord.class,
                         apartmentTransaction.id,
                         apartmentTransaction.apartmentName,
@@ -109,9 +91,13 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                         apartmentTransaction.dealAmount,
                         predictCost.predictedCost,
                         predictCost.isReliable
-                ));
+                )).orderBy(customPageable.orderBy())
+                .fetch();
     }
 
+    public Long getSearchCount(Long cachedCount, SearchCondition searchCondition) {
+        return (cachedCount != null) ? cachedCount : searchCondition.isEmpty()? getCountWithEmptyCondition(searchCondition) : getCount(searchCondition);
+    }
 
     private JPAQuery<?> buildApartmentsWithDongQuery(Gu gu, String dongName) {
         return querydsl
@@ -141,26 +127,6 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                         searchCondition.toReliabilityEq()
                 );
     }
-
-    private JPAQuery<?> buildApartmentSearchQueryWithEmptyCondition(SearchCondition searchCondition, CustomPageable customPageable) {
-        List<Long> ids = querydsl().applyPagination(customPageable.toPageable(),
-                querydsl.select(apartmentTransaction.id)
-                        .from(apartmentTransaction)
-                        .orderBy(customPageable.orderBy())
-        ).fetch();
-
-        return querydsl
-                .from(apartmentTransaction)
-                .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
-                .innerJoin(predictCost).on(apartmentTransaction.id.eq(predictCost.apartmentTransaction.id))
-                .where(
-                        apartmentTransaction.id.in(ids),
-                        betweenDealDate(searchCondition.getStartDealDate(), searchCondition.getEndDealDate()),
-                        eqRecentPredictStatus(),
-                        searchCondition.toReliabilityEq()
-                );
-    }
-
 
     private Long getCount(SearchCondition searchCondition) {
         return buildApartmentSearchQuery(searchCondition)
