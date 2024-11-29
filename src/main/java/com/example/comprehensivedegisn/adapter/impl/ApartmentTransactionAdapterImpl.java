@@ -3,6 +3,7 @@ package com.example.comprehensivedegisn.adapter.impl;
 import com.example.comprehensivedegisn.adapter.ApartmentTransactionAdapter;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
+import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepository;
@@ -33,7 +34,9 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
 
     @Override
     public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
-        return querydslApartmentTransactionRepository.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
+        List<SearchResponseRecord> elements = querydslApartmentTransactionRepository.searchApartmentTransactions(searchCondition, customPageable);
+        long count = getCount(cachedCount, searchCondition);
+        return new CustomPageImpl<>(elements, customPageable.toPageable(), count);
     }
 
     @Override
@@ -54,6 +57,10 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
     @Override
     public List<ApartmentTransaction> findApartmentTransactionsForGraph(Gu gu, String dongName, String apartmentName, double areaForExclusiveUse, LocalDate startDate, LocalDate endDate) {
         return apartmentTransactionRepository.findApartmentTransactionsForGraph(gu, dongName, apartmentName, areaForExclusiveUse, startDate, endDate);
+    }
+
+    private long getCount(Long cachedCount, SearchCondition searchCondition) {
+        return querydslApartmentTransactionRepository.getSearchCount(cachedCount, searchCondition);
     }
 
 
