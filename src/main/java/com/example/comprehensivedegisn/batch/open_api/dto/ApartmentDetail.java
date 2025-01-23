@@ -36,4 +36,8 @@ public record ApartmentDetail(@JacksonXmlProperty String dealAmount,
         return LocalDate.parse(createDealDate(), DATE_FORMATTER);
     }
 
+    public int getDealAmount() {
+        return Integer.parseInt(dealAmount.replaceAll(",", ""));
+    }
+
 }

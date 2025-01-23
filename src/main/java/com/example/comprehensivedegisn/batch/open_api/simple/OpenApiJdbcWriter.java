@@ -57,7 +57,7 @@ public class OpenApiJdbcWriter implements ItemWriter<ApartmentDetailResponse> {
                     ApartmentDetail apartmentDetail = items.get(i);
                     ps.setString(1, apartmentDetail.apartmentName() == null ? null : apartmentDetail.apartmentName().trim());
                     ps.setInt(2, apartmentDetail.buildYear());
-                    ps.setString(3, apartmentDetail.dealAmount().trim());
+                    ps.setInt(3, apartmentDetail.getDealAmount());
                     ps.setInt(4, apartmentDetail.dealYear());
                     ps.setInt(5, apartmentDetail.dealMonth());
                     ps.setInt(6, apartmentDetail.dealDay());
