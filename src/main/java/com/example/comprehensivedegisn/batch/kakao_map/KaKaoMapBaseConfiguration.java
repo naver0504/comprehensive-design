@@ -10,11 +10,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -23,7 +21,7 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 public class KaKaoMapBaseConfiguration {
 
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
     @Bean
     @StepScope
@@ -40,7 +38,7 @@ public class KaKaoMapBaseConfiguration {
         ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
 
         // size 6일시 메모리 사용량 95퍼 까지 상승
-        threadPoolTaskExecutor.setCorePoolSize(6);
+        threadPoolTaskExecutor.setCorePoolSize(4);
 
         //corePoolSize 만큼 thread 를 미리 생성한다.
         //threadPoolTaskExecutor.setPrestartAllCoreThreads(true);
@@ -71,28 +69,14 @@ public class KaKaoMapBaseConfiguration {
                 }
             }).filter(ApartmentGeoRecord::isNotEmpty).toList();
 
-
             log.info("start idx : {}", apartmentGeoRecords.get(0).id());
 
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement("""
+            jdbcTemplate.batchUpdate("""
                     update apartment_transaction set geography = ST_GeomFromText(?) where id = ?
-                    """.trim());
-
-            try(connection; statement) {
-                for (ApartmentGeoRecord apartmentGeoRecord : apartmentGeoRecords) {
-                    statement.setString(1, apartmentGeoRecord.toPoint());
-                    statement.setLong(2, apartmentGeoRecord.id());
-                    statement.addBatch();
-                }
-                statement.executeBatch();
-            } catch (Exception exception) {
-                log.error("Error while writing to db", exception);
-                throw exception;
-            }
+                    """.trim(), apartmentGeoRecords, apartmentGeoRecords.size(), (ps, record) -> {
+                ps.setString(1, record.toPoint());
+                ps.setLong(2, record.id());
+            });
         };
     }
-
-
-
 }
