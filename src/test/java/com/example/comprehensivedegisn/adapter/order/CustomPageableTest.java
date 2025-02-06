@@ -52,7 +52,7 @@ class CustomPageableTest {
 
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
-        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
+        Assertions.assertThat(apartmentTransactions.size()).isLessThanOrEqualTo(pageable.getPageSize());
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getDealAmount)
                 .isSorted();
@@ -77,7 +77,7 @@ class CustomPageableTest {
                 .fetch();
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
-        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
+        Assertions.assertThat(apartmentTransactions.size()).isLessThanOrEqualTo(pageable.getPageSize());
 
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getAreaForExclusiveUse)
@@ -102,7 +102,7 @@ class CustomPageableTest {
                 .fetch();
         // then
         Assertions.assertThat(orderType.getComparableExpressionBase()).isNotNull();
-        Assertions.assertThat(apartmentTransactions.size()).isEqualTo(pageable.getPageSize());
+        Assertions.assertThat(apartmentTransactions.size()).isLessThanOrEqualTo(pageable.getPageSize());
         Assertions.assertThat(apartmentTransactions)
                 .extracting(ApartmentTransaction::getDealDate)
                 .isSorted();

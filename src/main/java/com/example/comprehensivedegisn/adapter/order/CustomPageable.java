@@ -22,7 +22,7 @@ public class CustomPageable {
 
     public static final int DEFAULT_SIZE = 12;
 
-    private Order order = Order.DESC;
+    private Order order = Order.ASC;
     private OrderType orderType = OrderType.DEAL_DATE;
     private int page = 0;
 
