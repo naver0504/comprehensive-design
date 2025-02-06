@@ -24,7 +24,7 @@ public class LocationRecordCacheRepository implements CacheRepository<String, Lo
 
     @Override
     public Optional<LocationRecord> findByKey(String location) {
-        return location != null && locationRecordMap.containsKey(location) ? Optional.of(locationRecordMap.get(location)) : Optional.empty();
+        return Optional.ofNullable(locationRecordMap.get(location));
     }
 
     @Override
