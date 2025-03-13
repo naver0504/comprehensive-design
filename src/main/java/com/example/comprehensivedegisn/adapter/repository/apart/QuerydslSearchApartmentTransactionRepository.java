@@ -1,7 +1,10 @@
 package com.example.comprehensivedegisn.adapter.repository.apart;
 
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
+import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
+import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
@@ -27,20 +31,49 @@ public class QuerydslSearchApartmentTransactionRepository extends QuerydslApartm
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
+    public List<SearchResponseRecord> searchApartmentTransactions(SearchCondition searchCondition, CustomPageable customPageable) {
+        List<Long> ids = querydsl().applyPagination(customPageable.toPageable(), buildSearchPaginationQuery(searchCondition))
+                .select(apartmentTransaction.id)
+                .orderBy(customPageable.orderBy())
+                .fetch();
+
+        return jpaQueryFactory.select(Projections.constructor(SearchResponseRecord.class,
+                        apartmentTransaction.id,
+                        apartmentTransaction.apartmentName,
+                        dongEntity.gu,
+                        dongEntity.dongName,
+                        apartmentTransaction.areaForExclusiveUse,
+                        apartmentTransaction.dealDate,
+                        apartmentTransaction.dealAmount,
+                        predictCost.predictedCost,
+                        predictCost.isReliable
+                ))
+                .from(apartmentTransaction)
+                .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
+                .innerJoin(predictCost).on(apartmentTransaction.id.eq(predictCost.apartmentTransaction.id))
+                .where(apartmentTransaction.id.in(ids))
+                .orderBy(customPageable.orderBy())
+                .fetch();
+    }
 
     public Long getSearchCount(SearchCondition searchCondition) {
+        return buildSearchCountQuery(searchCondition).fetchOne();
+    }
+
+    public JPAQuery<?> buildSearchPaginationQuery(SearchCondition searchCondition) {
+        return searchCondition.isGuEmpty() ? buildQueryWithEmptyGuCondition(searchCondition) : buildQueryWithGuCondition(searchCondition);
+    }
+
+    public JPAQuery<Long> buildSearchCountQuery(SearchCondition searchCondition) {
         return searchCondition.isGuEmpty()? getCountWithEmptyGuCondition(searchCondition) : getCountWithGuCondition(searchCondition);
     }
 
-    private Long getCountWithGuCondition(SearchCondition searchCondition) {
-        return buildQueryWithGuCondition(searchCondition)
-                .select(apartmentTransaction.count())
-                .fetchOne();
+    private JPAQuery<Long> getCountWithGuCondition(SearchCondition searchCondition) {
+        return buildQueryWithGuCondition(searchCondition).select(apartmentTransaction.count());
     }
 
-    private Long getCountWithEmptyGuCondition(SearchCondition searchCondition) {
-        return buildCountQueryWithEmptyGuCondition(searchCondition)
-                .fetchOne();
+    private JPAQuery<Long> getCountWithEmptyGuCondition(SearchCondition searchCondition) {
+        return buildCountQueryWithEmptyGuCondition(searchCondition);
     }
 
     private JPAQuery<?> buildQueryWithGuCondition(SearchCondition searchCondition) {
@@ -68,14 +101,16 @@ public class QuerydslSearchApartmentTransactionRepository extends QuerydslApartm
 
         if(searchCondition.isReliabilityEmpty()) return jpaQueryFactory
                 .select(apartmentTransaction.dealDate.count())
+                .from(apartmentTransaction)
                 .where(betweenDealDate);
 
         if(Objects.isNull(betweenDealDate)) return jpaQueryFactory
                 .select(predictCost.id.count())
+                .from(predictCost)
                 .where(eqRecentPredictStatus(), searchCondition.toReliabilityEq());
 
         return buildQueryWithEmptyGuCondition(searchCondition)
-                .select(apartmentTransaction.count());
+                .select(predictCost.count());
     }
 
     private JPAQuery<?> buildQueryWithEmptyGuCondition(SearchCondition searchCondition) {
