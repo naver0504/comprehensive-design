@@ -27,12 +27,12 @@ import static com.example.comprehensivedegisn.adapter.domain.QPredictCost.*;
 @Repository
 public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTransactionSupporter {
 
+    private final JPAQueryFactory jpaQueryFactory;
+
     public QuerydslApartmentTransactionRepository(JPAQueryFactory jpaQueryFactory) {
         super(ApartmentTransaction.class);
         this.jpaQueryFactory = jpaQueryFactory;
     }
-
-    private final JPAQueryFactory jpaQueryFactory;
 
     public List<SearchApartNameResponse> findApartmentNames(Gu gu, String dongName) {
         return buildApartmentsWithDongQuery(gu, dongName)
@@ -122,29 +122,10 @@ public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTra
         return searchCondition.isGuEmpty()? getCountWithEmptyGuCondition(searchCondition) : getCount(searchCondition);
     }
 
-    public Long enhancedGetSearchCount(SearchCondition searchCondition) {
-        return searchCondition.isGuEmpty()? enhancedGetCountWithEmptyGuCondition(searchCondition) : enhancedGetCount(searchCondition);
-    }
-
     private Long getCount(SearchCondition searchCondition) {
         return buildApartmentSearchQuery(searchCondition)
                 .select(apartmentTransaction.count())
                 .fetchOne();
-    }
-
-    private Long enhancedGetCount(SearchCondition searchCondition) {
-        return setQueryWithReliability(searchCondition)
-                .select(dongEntity.count())
-                .from(dongEntity)
-                .innerJoin(apartmentTransaction).on(
-                        dongEntity.id.eq(apartmentTransaction.dongEntity.id),
-                        eqApartmentName(searchCondition.getApartmentName()),
-                        eqAreaForExclusiveUse(searchCondition.getAreaForExclusiveUse())
-                )
-                .where(
-                        eqGu(searchCondition.getGu()),
-                        eqDong(searchCondition.getDong())
-                ).fetchOne();
     }
 
     private Long getCountWithEmptyGuCondition(SearchCondition searchCondition) {
@@ -155,29 +136,6 @@ public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTra
                         searchCondition.toReliabilityEq()
                 )
                 .fetchOne();
-    }
-
-    private Long enhancedGetCountWithEmptyGuCondition(SearchCondition searchCondition) {
-        /***
-         *  predictCost와 apartmentTransaction을 innerJoin하면
-         *  count 쿼리 성능이 너무 떨어진다. 날짜 범위를 1년 씩 늘렸을 때
-         *  3년 단위로 쿼리 수행 시간이 2배 이상 증가한다.
-         */
-        return jpaQueryFactory
-                .select(apartmentTransaction.count())
-                .from(apartmentTransaction)
-                .where(betweenDealDate(searchCondition.getStartDealDate(), searchCondition.getEndDealDate())).fetchOne();
-    }
-
-    private JPAQuery<?> setQueryWithReliability(SearchCondition searchCondition) {
-        JPAQuery<?> query = jpaQueryFactory.query();
-        if(searchCondition.isReliabilityEmpty()) return query;
-        return query
-                .innerJoin(predictCost).on(
-                        predictCost.apartmentTransaction.id.eq(apartmentTransaction.id),
-                        eqRecentPredictStatus(),
-                        searchCondition.toReliabilityEq()
-                );
     }
 
     private Querydsl querydsl() {
