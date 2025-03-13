@@ -32,8 +32,12 @@ public class SearchCondition {
     private Reliability reliability = Reliability.ALL;
 
 
-    public boolean isEmpty() {
+    public boolean isGuEmpty() {
         return gu == Gu.NONE;
+    }
+
+    public boolean isReliabilityEmpty() {
+        return reliability == Reliability.ALL;
     }
 
     public BooleanExpression toReliabilityEq() {
