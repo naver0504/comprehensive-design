@@ -10,17 +10,11 @@ import com.example.comprehensivedegisn.dto.response.SearchResponseRecord;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
 import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.Querydsl;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,17 +25,14 @@ import static com.example.comprehensivedegisn.adapter.domain.QPredictCost.*;
 
 
 @Repository
-public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySupport {
+public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTransactionSupporter {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public QuerydslApartmentTransactionRepository(JPAQueryFactory querydsl, JPAQueryFactory jpaQueryFactory) {
+    public QuerydslApartmentTransactionRepository(JPAQueryFactory jpaQueryFactory) {
         super(ApartmentTransaction.class);
-        this.querydsl = querydsl;
         this.jpaQueryFactory = jpaQueryFactory;
     }
-
-    private final JPAQueryFactory querydsl;
 
     public List<SearchApartNameResponse> findApartmentNames(Gu gu, String dongName) {
         return buildApartmentsWithDongQuery(gu, dongName)
@@ -95,12 +86,10 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                 .fetch();
     }
 
-    public Long getSearchCount(Long cachedCount, SearchCondition searchCondition) {
-        return (cachedCount != null) ? cachedCount : searchCondition.isEmpty()? getCountWithEmptyCondition(searchCondition) : getCount(searchCondition);
-    }
+
 
     private JPAQuery<?> buildApartmentsWithDongQuery(Gu gu, String dongName) {
-        return querydsl
+        return jpaQueryFactory
                 .from(apartmentTransaction)
                 .distinct()
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
@@ -113,7 +102,7 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
     // 한 메소드에서 두 번 JpaQuery를 사용하면 두 번째 JpaQuery에서는
     // 첫 번째 JpaQuery에서 사용한 from, join 등이 초기화되어 있지 않아서 예외 또는 잘못된 결과가 나올 수 있습니다.
     private JPAQuery<?> buildApartmentSearchQuery(SearchCondition searchCondition) {
-        return querydsl
+        return jpaQueryFactory
                 .from(apartmentTransaction)
                 .innerJoin(dongEntity).on(apartmentTransaction.dongEntity.id.eq(dongEntity.id))
                 .innerJoin(predictCost).on(apartmentTransaction.id.eq(predictCost.apartmentTransaction.id))
@@ -128,14 +117,19 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
                 );
     }
 
+
+    public Long getSearchCount(SearchCondition searchCondition) {
+        return searchCondition.isGuEmpty()? getCountWithEmptyGuCondition(searchCondition) : getCount(searchCondition);
+    }
+
     private Long getCount(SearchCondition searchCondition) {
         return buildApartmentSearchQuery(searchCondition)
                 .select(apartmentTransaction.count())
                 .fetchOne();
     }
 
-    private Long getCountWithEmptyCondition(SearchCondition searchCondition) {
-        return querydsl.select(predictCost.count())
+    private Long getCountWithEmptyGuCondition(SearchCondition searchCondition) {
+        return jpaQueryFactory.select(predictCost.count())
                 .from(predictCost)
                 .where(
                         eqRecentPredictStatus(),
@@ -148,32 +142,4 @@ public class QuerydslApartmentTransactionRepository extends QuerydslRepositorySu
         return Objects.requireNonNull(getQuerydsl());
     }
 
-    private BooleanExpression eqGu(Gu gu) {
-        return gu == Gu.NONE ? apartmentTransaction.dongEntity.gu.in(Gu.guList) : apartmentTransaction.dongEntity.gu.eq(gu);
-    }
-
-    private BooleanExpression eqDong(String dong) {
-        return !StringUtils.hasText(dong) ? null : apartmentTransaction.dongEntity.dongName.eq(dong);
-    }
-
-    private BooleanExpression eqApartmentName(String apartmentName) {
-        return !StringUtils.hasText(apartmentName) ? null : apartmentTransaction.apartmentName.eq(apartmentName);
-    }
-
-    private BooleanExpression eqAreaForExclusiveUse(Double areaForExclusiveUse) {
-        return areaForExclusiveUse == null ? null : apartmentTransaction.areaForExclusiveUse.eq(areaForExclusiveUse);
-    }
-
-    private BooleanExpression betweenDealDate(LocalDate startDealDate, LocalDate endDealDate) {
-        if(startDealDate == null && endDealDate == null) {
-            return null;
-        }
-        startDealDate = Objects.isNull(startDealDate) ? LocalDate.of(2006, 1, 1) : startDealDate;
-        endDealDate = Objects.isNull(endDealDate) ? LocalDate.now() : endDealDate;
-        return apartmentTransaction.dealDate.between(startDealDate, endDealDate);
-    }
-
-    private BooleanExpression eqRecentPredictStatus() {
-        return predictCost.predictStatus.eq(PredictStatus.RECENT);
-    }
 }
