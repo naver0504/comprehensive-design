@@ -60,8 +60,7 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
     }
 
     private long getCount(Long cachedCount, SearchCondition searchCondition) {
-        return querydslApartmentTransactionRepository.getSearchCount(cachedCount, searchCondition);
+        if (cachedCount != null) return cachedCount;
+        return querydslApartmentTransactionRepository.getSearchCount(searchCondition);
     }
-
-
 }
