@@ -227,7 +227,7 @@ public class QuerydslApartmentTransactionRepositoryTest {
         if(cachedCount != null) {
             assertThat(result.getTotalElements()).isEqualTo(cachedCount);
         } else {
-            assertThat(result.getTotalElements()).isEqualTo(target.getSearchCount(cachedCount, searchCondition));
+            assertThat(result.getTotalElements()).isEqualTo(target.getSearchCount(searchCondition));
         }
     }
 
