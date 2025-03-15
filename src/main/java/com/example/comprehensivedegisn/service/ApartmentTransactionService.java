@@ -18,11 +18,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ApartmentTransactionService {
 
     private final ApartmentTransactionAdapter apartmentTransactionAdapter;
 
+    @Transactional(readOnly = true)
     public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
         if(searchCondition.isNotValid()) throw new IllegalArgumentException("검색 조건이 올바르지 않습니다.");
         return apartmentTransactionAdapter.searchApartmentTransactions(cachedCount, searchCondition, customPageable);
