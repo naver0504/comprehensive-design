@@ -3,6 +3,7 @@ package com.example.comprehensivedegisn.adapter.repository.apart;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.util.StringUtils;
 
@@ -44,5 +45,9 @@ public class QuerydslApartmentTransactionSupporter extends QuerydslRepositorySup
 
     protected BooleanExpression eqRecentPredictStatus() {
         return predictCost.predictStatus.eq(PredictStatus.RECENT);
+    }
+
+    protected Querydsl querydsl() {
+        return Objects.requireNonNull(getQuerydsl());
     }
 }

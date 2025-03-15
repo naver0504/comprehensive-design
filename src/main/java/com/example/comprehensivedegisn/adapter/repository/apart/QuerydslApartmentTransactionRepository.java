@@ -2,7 +2,6 @@ package com.example.comprehensivedegisn.adapter.repository.apart;
 
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.Gu;
-import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
@@ -12,11 +11,9 @@ import com.example.comprehensivedegisn.dto.response.TransactionDetailResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.apartmentTransaction;
@@ -86,8 +83,6 @@ public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTra
                 .fetch();
     }
 
-
-
     private JPAQuery<?> buildApartmentsWithDongQuery(Gu gu, String dongName) {
         return jpaQueryFactory
                 .from(apartmentTransaction)
@@ -137,9 +132,4 @@ public class QuerydslApartmentTransactionRepository extends QuerydslApartmentTra
                 )
                 .fetchOne();
     }
-
-    private Querydsl querydsl() {
-        return Objects.requireNonNull(getQuerydsl());
-    }
-
 }
