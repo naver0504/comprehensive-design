@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 
 import java.util.List;
@@ -36,6 +37,8 @@ public class QuerydslSearchApartmentTransactionRepository extends QuerydslApartm
                 .select(apartmentTransaction.id)
                 .orderBy(customPageable.orderBy())
                 .fetch();
+
+        if(CollectionUtils.isEmpty(ids)) return List.of();
 
         return jpaQueryFactory.select(Projections.constructor(SearchResponseRecord.class,
                         apartmentTransaction.id,

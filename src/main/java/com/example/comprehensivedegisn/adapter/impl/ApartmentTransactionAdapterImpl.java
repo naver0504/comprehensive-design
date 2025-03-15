@@ -7,6 +7,7 @@ import com.example.comprehensivedegisn.adapter.order.CustomPageImpl;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransactionRepository;
 import com.example.comprehensivedegisn.adapter.repository.apart.QuerydslApartmentTransactionRepository;
+import com.example.comprehensivedegisn.adapter.repository.apart.QuerydslSearchApartmentTransactionRepository;
 import com.example.comprehensivedegisn.dto.response.SearchApartNameResponse;
 import com.example.comprehensivedegisn.dto.response.SearchAreaResponse;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
@@ -26,6 +27,7 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
 
     private final ApartmentTransactionRepository apartmentTransactionRepository;
     private final QuerydslApartmentTransactionRepository querydslApartmentTransactionRepository;
+    private final QuerydslSearchApartmentTransactionRepository querydslSearchApartmentTransactionRepository;
 
     @Override
     public Optional<ApartmentTransaction> findApartmentTransactionById(Long id) {
@@ -34,7 +36,7 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
 
     @Override
     public Page<SearchResponseRecord> searchApartmentTransactions(Long cachedCount, SearchCondition searchCondition, CustomPageable customPageable) {
-        List<SearchResponseRecord> elements = querydslApartmentTransactionRepository.searchApartmentTransactions(searchCondition, customPageable);
+        List<SearchResponseRecord> elements = querydslSearchApartmentTransactionRepository.searchApartmentTransactions(searchCondition, customPageable);
         long count = getCount(cachedCount, searchCondition);
         return new CustomPageImpl<>(elements, customPageable.toPageable(), count);
     }
@@ -61,6 +63,6 @@ public class ApartmentTransactionAdapterImpl implements ApartmentTransactionAdap
 
     private long getCount(Long cachedCount, SearchCondition searchCondition) {
         if (cachedCount != null) return cachedCount;
-        return querydslApartmentTransactionRepository.getSearchCount(searchCondition);
+        return querydslSearchApartmentTransactionRepository.getSearchCount(searchCondition);
     }
 }
