@@ -22,7 +22,7 @@
 ### 🎛️ 시스템 아키텍쳐
 
 ---
-![budda 아키텍쳐 jpg](https://github.com/user-attachments/assets/8e9a52fd-9261-44c1-8314-87b0e51bd47a)
+![budda](https://github.com/user-attachments/assets/6bbdfee3-8502-49c7-8836-f9ab0e8ab3bb)
 
 ### 🙋‍♂️ 역할
 
