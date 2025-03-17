@@ -3,12 +3,14 @@ package com.example.comprehensivedegisn.api_client.predict;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.domain.PredictCost;
 import com.example.comprehensivedegisn.adapter.domain.PredictStatus;
-import com.example.comprehensivedegisn.batch.predict_cost.ApartmentQueryRecord;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentBatchQuery;
 import com.example.comprehensivedegisn.dto.response.PredictCostResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
-public class PredictApiClientForBatch extends PredictApiClient<ApartmentQueryRecord, PredictCost> {
+import java.util.Objects;
+
+public class PredictApiClientForBatch extends PredictApiClient<ApartmentBatchQuery, PredictCost> {
 
     private final RestTemplate restTemplate;
 
@@ -23,7 +25,7 @@ public class PredictApiClientForBatch extends PredictApiClient<ApartmentQueryRec
     }
 
     @Override
-    public String createUrl(ApartmentQueryRecord apartmentQueryRecord) {
+    public String createUrl(ApartmentBatchQuery apartmentQueryRecord) {
         return super.createUrl(apartmentQueryRecord)
                 + "&interestRate=" + apartmentQueryRecord.getInterestRate()
                 + "&dealDate=" + apartmentQueryRecord.getDealDate()
@@ -31,7 +33,7 @@ public class PredictApiClientForBatch extends PredictApiClient<ApartmentQueryRec
     }
 
     @Override
-    public PredictCost callApi(ApartmentQueryRecord apartmentQueryRecord) {
+    public PredictCost callApi(ApartmentBatchQuery apartmentQueryRecord) {
         PredictCostResponse response = restTemplate.exchange(
                 createUrl(apartmentQueryRecord),
                 HttpMethod.GET,
@@ -39,7 +41,12 @@ public class PredictApiClientForBatch extends PredictApiClient<ApartmentQueryRec
                 PredictCostResponse.class
         ).getBody();
 
-        return PredictCost.builder().predictedCost(response.prediction()).isReliable(response.reliable())
-                .predictStatus(PredictStatus.RECENT).apartmentTransaction(apartmentQueryRecord).build();
+        return PredictCost.builder()
+                .predictedCost(Objects.requireNonNull(response).prediction())
+                .isReliable(response.reliable())
+                .predictStatus(PredictStatus.RECENT)
+                .apartmentTransaction(ApartmentTransaction.builder().id(apartmentQueryRecord.getId()).build())
+                .build();
     }
+
 }

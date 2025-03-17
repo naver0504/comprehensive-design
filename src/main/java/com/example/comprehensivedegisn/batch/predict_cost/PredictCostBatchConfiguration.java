@@ -5,13 +5,13 @@ import com.example.comprehensivedegisn.adapter.repository.predict_cost.QuerydslP
 import com.example.comprehensivedegisn.api_client.ApiClient;
 import com.example.comprehensivedegisn.api_client.predict.PredictAiProperties;
 import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForBatch;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentBatchQuery;
 import com.example.comprehensivedegisn.batch.query_dsl.QuerydslNoOffsetIdPagingItemReader;
 import com.example.comprehensivedegisn.batch.query_dsl.expression.Expression;
 import com.example.comprehensivedegisn.batch.query_dsl.options.QuerydslNoOffsetNumberOptions;
 import com.querydsl.core.types.Projections;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -22,19 +22,15 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 
-import java.util.Map;
 
 import static com.example.comprehensivedegisn.adapter.domain.QApartmentTransaction.*;
 import static com.example.comprehensivedegisn.adapter.domain.QDongEntity.*;
@@ -103,7 +99,7 @@ public class PredictCostBatchConfiguration {
     @Bean
     public Step insertPredictCostStep() {
         return new StepBuilder(STEP_NAME, jobRepository)
-                .<ApartmentQueryRecord, PredictCost>chunk(SECOND_CHUNK_SIZE, platformTransactionManager)
+                .<ApartmentBatchQuery, PredictCost>chunk(SECOND_CHUNK_SIZE, platformTransactionManager)
                 .reader(apartmentTransactionQuerydslNoOffsetIdPagingItemReader())
                 .processor(predictCostQueryItemProcessor(predictApiClient()))
                 .writer(predictCostJdbcBatchItemWriter())
@@ -112,17 +108,22 @@ public class PredictCostBatchConfiguration {
 
     @Bean(name = STEP_NAME + "_QuerydslReader")
     @StepScope
-    public QuerydslNoOffsetIdPagingItemReader<ApartmentQueryRecord, Long> apartmentTransactionQuerydslNoOffsetIdPagingItemReader() {
+    public QuerydslNoOffsetIdPagingItemReader<ApartmentBatchQuery, Long> apartmentTransactionQuerydslNoOffsetIdPagingItemReader() {
 
-        QuerydslNoOffsetNumberOptions<ApartmentQueryRecord, Long> options = new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
+        QuerydslNoOffsetNumberOptions<ApartmentBatchQuery, Long> options = new QuerydslNoOffsetNumberOptions<>(apartmentTransaction.id, Expression.ASC);
 
         return new QuerydslNoOffsetIdPagingItemReader<>(emf, SECOND_CHUNK_SIZE, options, query -> query
                 .select(Projections.constructor(
-                        ApartmentQueryRecord.class,
-                        apartmentTransaction,
+                        ApartmentBatchQuery.class,
+                        apartmentTransaction.id,
                         interest.interestRate,
                         dongEntity.gu,
-                        dongEntity.dongName
+                        dongEntity.dongName,
+                        apartmentTransaction.dealDate,
+                        apartmentTransaction.dealAmount,
+                        apartmentTransaction.areaForExclusiveUse,
+                        apartmentTransaction.floor,
+                        apartmentTransaction.buildYear
                 ))
                 .from(apartmentTransaction)
                 .innerJoin(interest).on(apartmentTransaction.interest.id.eq(interest.id))
@@ -133,13 +134,13 @@ public class PredictCostBatchConfiguration {
 
     @Bean
     @StepScope
-    public ApiClient<ApartmentQueryRecord, PredictCost> predictApiClient() {
+    public ApiClient<ApartmentBatchQuery, PredictCost> predictApiClient() {
         return new PredictApiClientForBatch(predictAiProperties, restTemplate);
     }
 
     @Bean
     @StepScope
-    public ItemProcessor<ApartmentQueryRecord, PredictCost> predictCostQueryItemProcessor(ApiClient<ApartmentQueryRecord, PredictCost> apiClient) {
+    public ItemProcessor<ApartmentBatchQuery, PredictCost> predictCostQueryItemProcessor(ApiClient<ApartmentBatchQuery, PredictCost> apiClient) {
         return apiClient::callApi;
     }
 
@@ -157,5 +158,4 @@ public class PredictCostBatchConfiguration {
         });
         return predictCostJdbcBatchItemWriter;
     }
-
 }

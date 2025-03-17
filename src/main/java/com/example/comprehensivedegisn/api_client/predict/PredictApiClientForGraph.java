@@ -1,6 +1,6 @@
 package com.example.comprehensivedegisn.api_client.predict;
 
-import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentQuery;
 import com.example.comprehensivedegisn.dto.response.PredictAiResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-public class PredictApiClientForGraph extends PredictApiClient<ApartmentTransaction, PredictAiResponse> {
+public class PredictApiClientForGraph extends PredictApiClient<ApartmentQuery, PredictAiResponse> {
 
     private final RestTemplate restTemplate;
 
@@ -18,11 +18,11 @@ public class PredictApiClientForGraph extends PredictApiClient<ApartmentTransact
     }
 
     @Override
-    @Cacheable(value = "predictAi", key = "#apartmentTransaction.dongEntity.gu + ':' + #apartmentTransaction.dongEntity.dongName + ':' " +
-            "+ #apartmentTransaction.areaForExclusiveUse + ':' + #apartmentTransaction.floor + ':' + #apartmentTransaction.buildYear")
-    public PredictAiResponse callApi(ApartmentTransaction apartmentTransaction) {
+    @SuppressWarnings("unchecked")
+    @Cacheable(value = "predictAi", key = "#apartmentQuery.getGu() + ':' + #apartmentQuery.getDongName() + ':' + #apartmentQuery.getAreaForExclusiveUse() + ':' + #apartmentQuery.getFloor() + ':' + #apartmentQuery.getBuildYear()")
+    public PredictAiResponse callApi(ApartmentQuery apartmentQuery) {
         return new PredictAiResponse(restTemplate.exchange(
-                createUrl(apartmentTransaction),
+                createUrl(apartmentQuery),
                 HttpMethod.GET,
                 createHttpEntities(),
                 Map.class
