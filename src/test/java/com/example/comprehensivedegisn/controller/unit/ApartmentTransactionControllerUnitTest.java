@@ -7,6 +7,7 @@ import com.example.comprehensivedegisn.adapter.domain.Gu;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.adapter.order.OrderType;
 import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentGraphQuery;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
@@ -339,7 +340,7 @@ public class ApartmentTransactionControllerUnitTest {
                 .willReturn(apartmentTransaction);
         BDDMockito.given(apartmentTransactionService.findApartmentTransactionsForGraph(any(ApartmentTransaction.class)))
                 .willReturn(realTransactionGraphResponse);
-        BDDMockito.given(predictAiApiClient.callApi(any(ApartmentTransaction.class)))
+        BDDMockito.given(predictAiApiClient.callApi(any(ApartmentGraphQuery.class)))
                 .willReturn(predictAiResponse);
 
         // when
