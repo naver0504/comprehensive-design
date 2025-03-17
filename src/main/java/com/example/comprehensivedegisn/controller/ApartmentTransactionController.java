@@ -3,6 +3,7 @@ package com.example.comprehensivedegisn.controller;
 import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.adapter.order.CustomPageable;
 import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentGraphQuery;
 import com.example.comprehensivedegisn.dto.request.SearchApartNameRequest;
 import com.example.comprehensivedegisn.dto.request.SearchAreaRequest;
 import com.example.comprehensivedegisn.dto.request.SearchCondition;
@@ -38,7 +39,6 @@ public class ApartmentTransactionController {
     public ResponseEntity<Page<SearchResponseRecord>> searchApartmentTransactions(@RequestParam(required = false) Long cachedCount,
                                                                                   @ModelAttribute SearchCondition searchCondition,
                                                                                   @ModelAttribute CustomPageable customPageable) {
-
         return ResponseEntity.ok(apartmentTransactionService.searchApartmentTransactions(cachedCount, searchCondition, customPageable));
     }
 
@@ -61,7 +61,7 @@ public class ApartmentTransactionController {
     public ResponseEntity<GraphResponse> findApartmentTransactionsForGraph(@PathVariable long id) {
         ApartmentTransaction apartmentTransaction = apartmentTransactionService.findById(id);
         RealTransactionGraphResponse realData = apartmentTransactionService.findApartmentTransactionsForGraph(apartmentTransaction);
-        PredictAiResponse predictData = predictAiApiClient.callApi(apartmentTransaction);
+        PredictAiResponse predictData = predictAiApiClient.callApi(new ApartmentGraphQuery(apartmentTransaction));
         return ResponseEntity.ok(new GraphResponse(realData, predictData));
     }
 }

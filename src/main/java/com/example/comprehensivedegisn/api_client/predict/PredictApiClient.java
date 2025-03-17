@@ -1,7 +1,7 @@
 package com.example.comprehensivedegisn.api_client.predict;
 
-import com.example.comprehensivedegisn.adapter.domain.ApartmentTransaction;
 import com.example.comprehensivedegisn.api_client.ApiClient;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 
 @RequiredArgsConstructor
-public abstract class PredictApiClient<T  extends  ApartmentTransaction, R> implements ApiClient<T  , R> {
+public abstract class PredictApiClient<T  extends ApartmentQuery, R> implements ApiClient<T  , R> {
 
     protected final PredictAiProperties predictAiProperties;
 

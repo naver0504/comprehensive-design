@@ -7,6 +7,7 @@ import com.example.comprehensivedegisn.adapter.repository.apart.ApartmentTransac
 import com.example.comprehensivedegisn.adapter.repository.dong.DongRepository;
 import com.example.comprehensivedegisn.adapter.repository.predict_cost.PredictCostRepository;
 import com.example.comprehensivedegisn.api_client.predict.PredictApiClientForGraph;
+import com.example.comprehensivedegisn.api_client.predict.dto.ApartmentGraphQuery;
 import com.example.comprehensivedegisn.config.error.ControllerAdvice;
 import com.example.comprehensivedegisn.config.error.CustomHttpDetail;
 import com.example.comprehensivedegisn.config.error.CustomHttpExceptionResponse;
@@ -330,7 +331,7 @@ public class ApartmentTransactionControllerIntegrationTest {
         PredictAiResponse predictAiResponse = new PredictAiResponse(predictData);
         GraphResponse expected = new GraphResponse(realTransactionGraphResponse, predictAiResponse);
 
-        BDDMockito.given(mockPredictAiApiClient.callApi(any(ApartmentTransaction.class))).willReturn(predictAiResponse);
+        BDDMockito.given(mockPredictAiApiClient.callApi(any(ApartmentGraphQuery.class))).willReturn(predictAiResponse);
 
         // when
         ResultActions resultActions = mockMvc.perform(get(url)
