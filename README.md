@@ -60,6 +60,7 @@
 
 ### 👀 서비스 화면
 ---
-![image](https://github.com/user-attachments/assets/fd3044ed-f3ea-4641-bcbe-305b23ddd86c)
-![image (1)](https://github.com/user-attachments/assets/a6ead61b-1819-4938-9e0b-b938e07388d8)
+![image](https://github.com/user-attachments/assets/85d39dd6-19bc-40f9-b046-c36f16ad80d2)
+![image](https://github.com/user-attachments/assets/b29d1486-28ba-4715-85d9-5cfffc97192d)
+
 
